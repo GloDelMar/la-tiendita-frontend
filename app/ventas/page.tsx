@@ -456,7 +456,6 @@ export default function VentasPage() {
 
           {/* Grid de productos */}
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
-            {console.log('[VENTAS] 🎨 Renderizando grid con', filteredProducts.length, 'productos')}
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
