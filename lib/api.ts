@@ -293,6 +293,7 @@ export const cashApi = {
     fecha_desde?: string;
     fecha_hasta?: string;
     tipo_operacion?: string;
+    caja_id?: number;
   }) => {
     const params = new URLSearchParams();
     if (filters) {
