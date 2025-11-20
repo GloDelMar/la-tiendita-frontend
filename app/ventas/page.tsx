@@ -1,0 +1,703 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { productsApi, transactionsApi } from '@/lib/api';
+import { formatCurrency } from '@/lib/utils';
+import NumeroSelector from '@/components/NumeroSelector';
+import { downloadReceipt, printReceipt } from '@/lib/receiptGenerator';
+import { useCaja } from '@/contexts/CajaContext';
+
+interface Product {
+  id: number;
+  nombre: string;
+  precio: number;
+  stock: number;
+  image_url?: string;
+  caja_id?: number;
+}
+
+interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export default function VentasPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { selectedCaja } = useCaja();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [cliente, setCliente] = useState('');
+  const [grupo, setGrupo] = useState('');
+  const [isCredit, setIsCredit] = useState(false);
+  const [payment, setPayment] = useState('');
+  const [selectedCoins, setSelectedCoins] = useState<Array<{denom: number, count: number}>>([]);
+  const [showQuantityModal, setShowQuantityModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedQuantity, setSelectedQuantity] = useState(0);
+  const [changeSuggestionIndex, setChangeSuggestionIndex] = useState(0);
+  const [showCustomClientInput, setShowCustomClientInput] = useState(false);
+
+  // Lista de maestros con acceso a crédito
+  const maestrosConCredito = [
+    { nombre: 'Maestra Daniela', grupo: '3° de secundaria' },
+    { nombre: 'Maestro Omar', grupo: '1° de secundaria' },
+    { nombre: 'Maestro Jorge', grupo: '3° de primaria' },
+    { nombre: 'Maestro Ramón', grupo: '4° de primaria' },
+    { nombre: 'Maestro Juan Ramón', grupo: '6° de primaria' },
+    { nombre: 'Maestra Daniela C.', grupo: '2° de primaria' },
+    { nombre: 'Maestra Blanca', grupo: '1° de primaria' },
+    { nombre: 'Maestra Rocío', grupo: 'Preescolar' },
+    { nombre: 'Maestra Gloriela', grupo: 'Taller Laboral' },
+  ];
+
+  // Helper para obtener el nombre correcto de la imagen de moneda
+  const getMonedaImage = (valor: number): string => {
+    if (valor === 0.5) return '/monedas/50centavos.png';
+    if (valor === 20) return '/monedas/20pesos.png';
+    return `/monedas/${valor}.png`;
+  };
+
+  useEffect(() => {
+    // Redirigir al dashboard si no hay caja seleccionada
+    if (!selectedCaja) {
+      router.push('/');
+      return;
+    }
+    
+    loadProducts();
+    
+    // Cargar carrito desde localStorage
+    const savedCart = localStorage.getItem('ventas_cart');
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (e) {
+        console.error('Error loading cart from localStorage:', e);
+      }
+    }
+    
+    // Recibir monedas seleccionadas desde URL
+    const pagoFromUrl = searchParams.get('pago');
+    const monedasFromUrl = searchParams.get('monedas');
+    
+    if (pagoFromUrl && monedasFromUrl) {
+      setPayment(pagoFromUrl);
+      try {
+        const monedas = JSON.parse(decodeURIComponent(monedasFromUrl));
+        setSelectedCoins(monedas);
+      } catch (e) {
+        console.error('Error parsing monedas:', e);
+      }
+    }
+  }, [searchParams, selectedCaja, router]);
+
+  // Guardar carrito en localStorage cada vez que cambie
+  useEffect(() => {
+    if (cart.length > 0) {
+      localStorage.setItem('ventas_cart', JSON.stringify(cart));
+    }
+  }, [cart]);
+
+  async function loadProducts() {
+    if (!selectedCaja) return;
+    
+    console.log('[VENTAS] 🔄 Iniciando carga de productos...');
+    const startTime = performance.now();
+    
+    try {
+      console.log('[VENTAS] 📡 Llamando a productsApi.getAll()...');
+      const data = await productsApi.getAll(selectedCaja.id);
+      
+      const endTime = performance.now();
+      const loadTime = (endTime - startTime).toFixed(2);
+      
+      console.log('[VENTAS] ✅ Productos cargados exitosamente');
+      console.log(`[VENTAS] 📊 Total de productos: ${data.length}`);
+      console.log(`[VENTAS] ⏱️ Tiempo de carga: ${loadTime}ms`);
+      console.log('[VENTAS] 📦 Datos recibidos:', data);
+      
+      if (data.length > 0) {
+        console.log('[VENTAS] 🔍 Estructura del primer producto:', data[0]);
+        console.log('[VENTAS] 🔍 Keys del primer producto:', Object.keys(data[0]));
+      }
+      
+      // Mapear los datos de la API (name, price) a la interfaz esperada (nombre, precio, stock)
+      const mappedProducts = data.map((p: any) => ({
+        id: p.id,
+        nombre: p.name,
+        precio: p.price,
+        stock: p.stock || 999, // Stock por defecto si no existe
+        image_url: p.image_url,
+        caja_id: p.caja_id
+      }));
+      
+      console.log('[VENTAS] 🔄 Productos mapeados:', mappedProducts);
+      setProducts(mappedProducts);
+      console.log('[VENTAS] ✔️ setProducts ejecutado con', mappedProducts.length, 'productos');
+    } catch (error) {
+      const endTime = performance.now();
+      const loadTime = (endTime - startTime).toFixed(2);
+      
+      console.error('[VENTAS] ❌ Error al cargar productos');
+      console.error(`[VENTAS] ⏱️ Tiempo hasta error: ${loadTime}ms`);
+      console.error('[VENTAS] 🐛 Detalles del error:', error);
+    } finally {
+      console.log('[VENTAS] 🏁 Finalizando loadProducts - setLoading(false)');
+      setLoading(false);
+    }
+  }
+
+  const openQuantityModal = (product: Product) => {
+    setSelectedProduct(product);
+    const existingItem = cart.find(item => item.product.id === product.id);
+    setSelectedQuantity(existingItem?.quantity || 0);
+    setShowQuantityModal(true);
+  };
+
+  const confirmQuantity = () => {
+    if (!selectedProduct || selectedQuantity === 0) {
+      setShowQuantityModal(false);
+      return;
+    }
+
+    const existing = cart.find(item => item.product.id === selectedProduct.id);
+    if (existing) {
+      setCart(cart.map(item =>
+        item.product.id === selectedProduct.id
+          ? { ...item, quantity: Math.min(selectedQuantity, selectedProduct.stock) }
+          : item
+      ));
+    } else {
+      setCart([...cart, { product: selectedProduct, quantity: Math.min(selectedQuantity, selectedProduct.stock) }]);
+    }
+
+    setShowQuantityModal(false);
+    setSelectedProduct(null);
+    setSelectedQuantity(0);
+  };
+
+  const updateQuantity = (productId: number, newQuantity: number) => {
+    if (newQuantity === 0) {
+      removeFromCart(productId);
+      return;
+    }
+    setCart(cart.map(item =>
+      item.product.id === productId
+        ? { ...item, quantity: Math.min(newQuantity, item.product.stock) }
+        : item
+    ));
+  };
+
+  const removeFromCart = (productId: number) => {
+    setCart(cart.filter(item => item.product.id !== productId));
+  };
+
+  const calculateTotal = () => {
+    return cart.reduce((sum, item) => sum + (item.product.precio * item.quantity), 0);
+  };
+
+  const calculateChange = () => {
+    const paymentAmount = parseFloat(payment) || 0;
+    return paymentAmount - calculateTotal();
+  };
+
+  // Función para calcular sugerencias de cambio
+  const getChangeSuggestions = (changeAmount: number) => {
+    if (changeAmount <= 0) return [];
+
+    const denominations = [500, 200, 100, 50, 20, 10, 5, 2, 1, 0.5];
+    const suggestions: Array<{ denom: number; count: number }[]> = [];
+
+    // Sugerencia 1: Óptima (menos billetes/monedas)
+    let remaining = changeAmount;
+    const optimal: { denom: number; count: number }[] = [];
+    for (const denom of denominations) {
+      const count = Math.floor(remaining / denom);
+      if (count > 0) {
+        optimal.push({ denom, count });
+        remaining = Math.round((remaining - denom * count) * 100) / 100;
+      }
+    }
+    suggestions.push(optimal);
+
+    // Sugerencia 2: Alternativa con billetes más pequeños
+    if (changeAmount >= 20) {
+      remaining = changeAmount;
+      const alternative: { denom: number; count: number }[] = [];
+      const altDenoms = [100, 50, 20, 10, 5, 2, 1, 0.5];
+      for (const denom of altDenoms) {
+        const count = Math.floor(remaining / denom);
+        if (count > 0) {
+          alternative.push({ denom, count });
+          remaining = Math.round((remaining - denom * count) * 100) / 100;
+        }
+      }
+      if (JSON.stringify(alternative) !== JSON.stringify(optimal)) {
+        suggestions.push(alternative);
+      }
+    }
+
+    // Sugerencia 3: Solo billetes de 20 y monedas pequeñas
+    if (changeAmount >= 10 && changeAmount <= 200) {
+      remaining = changeAmount;
+      const smallBills: { denom: number; count: number }[] = [];
+      const smallDenoms = [50, 20, 10, 5, 2, 1, 0.5];
+      for (const denom of smallDenoms) {
+        const count = Math.floor(remaining / denom);
+        if (count > 0) {
+          smallBills.push({ denom, count });
+          remaining = Math.round((remaining - denom * count) * 100) / 100;
+        }
+      }
+      if (JSON.stringify(smallBills) !== JSON.stringify(optimal)) {
+        suggestions.push(smallBills);
+      }
+    }
+
+    return suggestions;
+  };
+
+  const getNextChangeSuggestion = () => {
+    const change = calculateChange();
+    const suggestions = getChangeSuggestions(change);
+    setChangeSuggestionIndex((prev) => (prev + 1) % suggestions.length);
+  };
+
+  const renderChangeSuggestion = () => {
+    const change = calculateChange();
+    if (change <= 0) return null;
+
+    const suggestions = getChangeSuggestions(change);
+    if (suggestions.length === 0) return null;
+
+    const currentSuggestion = suggestions[changeSuggestionIndex] || suggestions[0];
+
+    return (
+      <div className="bg-purple-100 p-4 rounded-xl border-2 border-purple-300">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-base text-purple-900 font-semibold">💡 Sugerencia para dar el cambio:</span>
+          <span className="font-bold text-2xl text-purple-600">
+            {formatCurrency(change)}
+          </span>
+        </div>
+
+        <div className="mt-3 space-y-2">
+          {currentSuggestion.map((item, idx) => (
+            <div key={idx} className="flex flex-wrap gap-1 bg-white p-2 rounded-lg">
+              {Array.from({ length: item.count }).map((_, i) => (
+                <div key={i} className="relative">
+                  <img
+                    src={getMonedaImage(item.denom)}
+                    alt={`${item.denom}`}
+                    className="w-10 h-10 object-contain"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        
+        {suggestions.length > 1 && (
+          <button
+            onClick={getNextChangeSuggestion}
+            className="w-full mt-3 text-sm bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors font-semibold"
+          >
+            🔄 Ver otra sugerencia ({changeSuggestionIndex + 1}/{suggestions.length})
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  const abrirSelectorMonedas = () => {
+    const total = calculateTotal();
+    router.push(`/monedas?total=${total}&modo=pago`);
+  };
+
+  async function handleCompleteSale() {
+    console.log('[VENTAS] 🚀 handleCompleteSale iniciado');
+    console.log('[VENTAS] - cart.length:', cart.length);
+    console.log('[VENTAS] - isCredit:', isCredit);
+    console.log('[VENTAS] - payment:', payment);
+    
+    if (cart.length === 0) {
+      console.log('[VENTAS] ❌ Carrito vacío');
+      return;
+    }
+
+    if (!isCredit && !payment) {
+      console.log('[VENTAS] ❌ Falta el monto del pago');
+      alert('Por favor ingresa el monto del pago');
+      return;
+    }
+
+    const total = calculateTotal();
+    const paymentAmount = isCredit ? 0 : parseFloat(payment);
+    const change = isCredit ? 0 : paymentAmount - total;
+    
+    console.log('[VENTAS] 💰 Valores calculados:');
+    console.log('[VENTAS] - total:', total);
+    console.log('[VENTAS] - paymentAmount:', paymentAmount);
+    console.log('[VENTAS] - change:', change);
+    
+    const productosArray = cart.map(item => ({
+      nombre: item.product.nombre,
+      cantidad: item.quantity,
+      precio_unitario: item.product.precio,
+      subtotal: item.product.precio * item.quantity
+    }));
+
+    console.log('[VENTAS] 📦 Productos:', productosArray);
+
+    try {
+      console.log('[VENTAS] 📡 Llamando a API...');
+      const transaction = await transactionsApi.create({
+        productos: productosArray,
+        total,
+        cliente: cliente || 'Cliente general',
+        grupo: grupo || 'General',
+        pagado: isCredit ? 'NO' : 'SI',
+        pago: paymentAmount,
+        cambio: change,
+        caja_id: selectedCaja?.id,
+      });
+
+      console.log('[VENTAS] ✅ Transacción creada:', transaction);
+
+      // Generar y descargar recibo automáticamente
+      const receiptData = {
+        id: transaction.id,
+        fecha: transaction.fecha || new Date().toISOString(),
+        cliente: cliente || 'Cliente general',
+        grupo: grupo || 'General',
+        productos: productosArray,
+        total,
+        pago: paymentAmount,
+        cambio: change,
+        pagado: isCredit ? 'NO' : 'SI',
+      };
+
+      // Preguntar si desea imprimir o solo descargar
+      const shouldPrint = confirm('¡Venta completada! ¿Deseas imprimir el recibo?\n\nSí = Imprimir\nNo = Solo descargar PDF');
+      
+      if (shouldPrint) {
+        printReceipt(receiptData);
+      } else {
+        downloadReceipt(receiptData);
+      }
+
+      setCart([]);
+      setCliente('');
+      setGrupo('');
+      setPayment('');
+      setIsCredit(false);
+      setShowCustomClientInput(false);
+      setSelectedCoins([]);
+      localStorage.removeItem('ventas_cart'); // Limpiar carrito del localStorage
+      loadProducts();
+      
+      console.log('[VENTAS] 🎉 Venta completada exitosamente');
+    } catch (error) {
+      console.error('[VENTAS] ❌ Error completing sale:', error);
+      alert('Error al completar la venta');
+    }
+  }
+
+  const filteredProducts = products.filter(p =>
+    p?.nombre?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
+  console.log('[VENTAS] 🔎 Estado actual:');
+  console.log(`[VENTAS] - products.length: ${products.length}`);
+  console.log(`[VENTAS] - filteredProducts.length: ${filteredProducts.length}`);
+  console.log(`[VENTAS] - searchTerm: "${searchTerm}"`);
+  console.log(`[VENTAS] - loading: ${loading}`);
+  if (products.length > 0) {
+    console.log('[VENTAS] - Primer producto:', products[0]);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Productos */}
+        <div className="lg:col-span-2">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
+              🛒 <span>Nueva Venta</span>
+            </h1>
+            <div className="bg-blue-100 px-4 py-2 rounded-lg">
+              <span className="text-sm font-semibold text-blue-900">Caja: {selectedCaja?.nombre}</span>
+            </div>
+          </div>
+
+          {/* Búsqueda */}
+          <input
+            type="text"
+            placeholder="🔍 Buscar producto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-6 py-4 text-xl border-4 border-gray-300 rounded-2xl mb-6 focus:ring-4 focus:ring-blue-500 focus:border-blue-500 shadow-lg"
+          />
+
+          {/* Grid de productos */}
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+            {console.log('[VENTAS] 🎨 Renderizando grid con', filteredProducts.length, 'productos')}
+            {filteredProducts.map((product) => (
+              <div
+                key={product.id}
+                onClick={() => openQuantityModal(product)}
+                className="bg-white rounded-2xl shadow-lg p-6 cursor-pointer hover:shadow-2xl hover:scale-105 transition-all border-4 border-transparent hover:border-blue-400"
+              >
+                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
+                  {product.image_url ? (
+                    <img src={product.image_url} alt={product.nombre} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-6xl">📦</span>
+                  )}
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2 text-lg">{product.nombre}</h3>
+                <p className="text-2xl font-bold text-blue-600 mb-1">{formatCurrency(product.precio)}</p>
+                <p className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full inline-block">
+                  Stock: {product.stock}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Carrito */}
+        <div className="lg:sticky lg:top-6 lg:h-fit">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 border-4 border-blue-200">
+            <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
+              🛍️ <span>Carrito</span>
+            </h2>
+
+            {cart.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🛒</div>
+                <p className="text-gray-500 text-xl">Carrito vacío</p>
+              </div>
+            ) : (
+              <div className="max-h-[400px] overflow-y-auto space-y-4 mb-6 pr-2">
+                {cart.map((item, index) => (
+                  <div key={index} className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
+                    <div className="flex-1">
+                      <p className="font-bold text-lg">{item.product.nombre}</p>
+                      <p className="text-xl text-blue-600 font-semibold">{formatCurrency(item.product.precio)}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                        className="w-12 h-12 bg-red-500 hover:bg-red-600 text-white rounded-xl text-2xl font-bold"
+                      >
+                        −
+                      </button>
+                      <button
+                        onClick={() => openQuantityModal(item.product)}
+                        className="w-16 text-center font-bold text-3xl bg-white rounded-xl py-2 border-2 border-blue-300 hover:border-blue-500"
+                      >
+                        {item.quantity}
+                      </button>
+                      <button
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                        className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-xl text-2xl font-bold"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => removeFromCart(item.product.id)}
+                      className="text-3xl hover:scale-125 transition-transform"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="border-t-4 border-blue-300 pt-6 mb-6">
+              <div className="flex justify-between items-center bg-gradient-to-r from-blue-100 to-purple-100 p-4 rounded-xl mb-6">
+                <span className="text-2xl font-bold">Total:</span>
+                <span className="text-4xl font-bold text-blue-600">{formatCurrency(calculateTotal())}</span>
+              </div>
+
+              <div className="space-y-4">
+                {/* Selector de Cliente */}
+                {showCustomClientInput ? (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="👤 Nombre del cliente"
+                      value={cliente}
+                      onChange={(e) => setCliente(e.target.value)}
+                      className="w-full px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="👥 Grupo (opcional)"
+                      value={grupo}
+                      onChange={(e) => setGrupo(e.target.value)}
+                      className="w-full px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <button
+                      onClick={() => {
+                        setShowCustomClientInput(false);
+                        setCliente('');
+                        setGrupo('');
+                      }}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      ← Volver a lista de maestros
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <select
+                      value={cliente ? `${cliente}|${grupo}` : ''}
+                      onChange={(e) => {
+                        if (e.target.value === 'custom') {
+                          setShowCustomClientInput(true);
+                          setCliente('');
+                          setGrupo('');
+                        } else if (e.target.value) {
+                          const [nombre, grupoVal] = e.target.value.split('|');
+                          setCliente(nombre);
+                          setGrupo(grupoVal);
+                        } else {
+                          setCliente('');
+                          setGrupo('');
+                        }
+                      }}
+                      className="w-full px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                    >
+                      <option value="">👤 Seleccionar maestro (opcional)</option>
+                      {maestrosConCredito.map((maestro, idx) => (
+                        <option key={idx} value={`${maestro.nombre}|${maestro.grupo}`}>
+                          {maestro.nombre} - {maestro.grupo}
+                        </option>
+                      ))}
+                      <option value="custom">✏️ Otro cliente...</option>
+                    </select>
+                    {cliente && (
+                      <div className="bg-blue-50 px-4 py-2 rounded-lg">
+                        <p className="text-sm text-blue-900">
+                          <strong>{cliente}</strong> - {grupo}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <label className="flex items-center gap-3 cursor-pointer bg-yellow-100 p-4 rounded-xl border-2 border-yellow-300">
+                  <input
+                    type="checkbox"
+                    checked={isCredit}
+                    onChange={(e) => setIsCredit(e.target.checked)}
+                    className="w-7 h-7"
+                  />
+                  <span className="font-bold text-lg">📝 Venta a crédito</span>
+                </label>
+
+                {!isCredit && (
+                  <>
+                    <button
+                      onClick={abrirSelectorMonedas}
+                      className="w-full bg-gradient-to-r from-green-400 to-blue-400 hover:from-green-500 hover:to-blue-500 text-white px-6 py-4 rounded-xl text-xl font-bold flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transition-all"
+                    >
+                      💰 <span>¿Con cuánto pagas?</span>
+                    </button>
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="💵 O escribe el monto..."
+                      value={payment}
+                      onChange={(e) => {
+                        setPayment(e.target.value);
+                        setSelectedCoins([]); // Limpiar monedas si escribe manualmente
+                        setChangeSuggestionIndex(0); // Reset suggestion index on payment change
+                      }}
+                      className="w-full px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={handleCompleteSale}
+              disabled={cart.length === 0}
+              className={`w-full py-5 rounded-2xl font-bold text-2xl shadow-lg transition-all ${
+                cart.length === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:scale-105'
+              }`}
+            >
+              ✅ Completar Venta
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal de selección de cantidad */}
+      {showQuantityModal && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-3 my-2 max-h-[98vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-bold text-gray-900">¿Cuántos llevas?</h2>
+              <button
+                onClick={() => {
+                  setShowQuantityModal(false);
+                  setSelectedProduct(null);
+                  setSelectedQuantity(0);
+                }}
+                className="text-2xl hover:scale-110 transition-transform"
+              >
+                ✖️
+              </button>
+            </div>
+
+            <div className="bg-blue-50 rounded-lg p-2 mb-2">
+              <p className="text-base font-bold text-gray-900">{selectedProduct.nombre}</p>
+              <p className="text-lg font-bold text-blue-600">{formatCurrency(selectedProduct.precio)}</p>
+              <p className="text-xs text-gray-600">Stock: {selectedProduct.stock}</p>
+            </div>
+
+            <NumeroSelector
+              cantidad={selectedQuantity}
+              onChange={setSelectedQuantity}
+              max={selectedProduct.stock}
+            />
+
+            <button
+              onClick={confirmQuantity}
+              disabled={selectedQuantity === 0}
+              className={`w-full mt-2 py-2 rounded-lg font-bold text-base shadow-lg transition-all ${
+                selectedQuantity === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:scale-105'
+              }`}
+            >
+              ✅ Agregar al Carrito
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
