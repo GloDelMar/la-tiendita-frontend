@@ -163,6 +163,7 @@ export const transactionsApi = {
     pago: number;
     cambio: number;
     pagado: 'SI' | 'NO';
+    caja_id?: number;
   }) => {
     const res = await fetch(`${API_URL}/api/transactions`, {
       method: 'POST',
