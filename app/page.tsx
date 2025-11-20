@@ -31,7 +31,7 @@ export default function Dashboard() {
       setCajas(data);
       
       // Cargar estadísticas de cada caja
-      const statsPromises = data.map(async (caja) => {
+      const statsPromises = data.map(async (caja: Caja) => {
         try {
           const [saldo, productos] = await Promise.all([
             cajasApi.getSaldo(caja.id),
