@@ -40,6 +40,22 @@ export default function VentasPage() {
   const [selectedQuantity, setSelectedQuantity] = useState(0);
   const [changeSuggestionIndex, setChangeSuggestionIndex] = useState(0);
   const [showCustomClientInput, setShowCustomClientInput] = useState(false);
+  const [showChangeSuggestionModal, setShowChangeSuggestionModal] = useState(false);
+  const [changeSuggestions, setChangeSuggestions] = useState<Array<{ [key: number]: number }>>([]);
+  const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
+
+  // Denominaciones de monedas y billetes
+  const DENOMINACIONES = [
+    { valor: 200, tipo: 'billete', imagen: '/monedas/200.png', alt: '💵' },
+    { valor: 100, tipo: 'billete', imagen: '/monedas/100.png', alt: '💵' },
+    { valor: 50, tipo: 'billete', imagen: '/monedas/50.png', alt: '💵' },
+    { valor: 20, tipo: 'billete', imagen: '/monedas/20pesos.png', alt: '💵' },
+    { valor: 10, tipo: 'moneda', imagen: '/monedas/10.png', alt: '🪙' },
+    { valor: 5, tipo: 'moneda', imagen: '/monedas/5.png', alt: '🪙' },
+    { valor: 2, tipo: 'moneda', imagen: '/monedas/2.png', alt: '🪙' },
+    { valor: 1, tipo: 'moneda', imagen: '/monedas/1.png', alt: '🪙' },
+    { valor: 0.5, tipo: 'moneda', imagen: '/monedas/50centavos.png', alt: '🪙' },
+  ];
 
   // Lista de maestros con acceso a crédito
   const maestrosConCredito = [
@@ -319,6 +335,62 @@ export default function VentasPage() {
   const abrirSelectorMonedas = () => {
     const total = calculateTotal();
     router.push(`/monedas?total=${total}&modo=pago`);
+  };
+
+  // Función para generar sugerencias de cambio
+  const generarSugerenciasCambio = (monto: number) => {
+    if (monto <= 0) {
+      setChangeSuggestions([]);
+      return;
+    }
+    
+    const sugerencias: Array<{ [key: number]: number }> = [];
+    
+    // Generar 15 sugerencias diferentes
+    for (let intento = 0; intento < 15; intento++) {
+      const resultado: { [key: number]: number } = {};
+      let restante = Math.round(monto * 100) / 100;
+      
+      // Crear lista de denominaciones y mezclarlas aleatoriamente
+      const denomsDisponibles = [...DENOMINACIONES].sort(() => Math.random() - 0.5);
+      
+      for (const denom of denomsDisponibles) {
+        if (restante >= denom.valor) {
+          const maxCantidad = Math.floor(restante / denom.valor);
+          // Variar la estrategia: a veces usar máximo, a veces aleatorio
+          const cantidad = Math.random() > 0.5 ? maxCantidad : Math.max(1, Math.floor(Math.random() * maxCantidad) + 1);
+          
+          if (cantidad > 0) {
+            resultado[denom.valor] = cantidad;
+            restante = Math.round((restante - (cantidad * denom.valor)) * 100) / 100;
+          }
+        }
+      }
+      
+      // Si aún queda resto, completar con la denominación más pequeña
+      if (restante > 0) {
+        const denominacionMinima = 0.5;
+        const cantidadFaltante = Math.ceil(restante / denominacionMinima);
+        resultado[denominacionMinima] = (resultado[denominacionMinima] || 0) + cantidadFaltante;
+      }
+      
+      sugerencias.push(resultado);
+    }
+    
+    // Ordenar sugerencias por cantidad total de elementos (menor a mayor)
+    sugerencias.sort((a, b) => {
+      const totalA = Object.values(a).reduce((sum, val) => sum + val, 0);
+      const totalB = Object.values(b).reduce((sum, val) => sum + val, 0);
+      return totalA - totalB;
+    });
+    
+    setChangeSuggestions(sugerencias);
+    setCurrentSuggestionIndex(0);
+  };
+
+  const getMonedaImage = (valor: number): string => {
+    const denom = DENOMINACIONES.find(d => d.valor === valor);
+    return denom?.imagen || `/monedas/${valor}.png`;
   };
 
   async function handleCompleteSale() {
@@ -621,18 +693,33 @@ export default function VentasPage() {
                     >
                       💰 <span>¿Con cuánto pagas?</span>
                     </button>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="💵 O escribe el monto..."
-                      value={payment}
-                      onChange={(e) => {
-                        setPayment(e.target.value);
-                        setSelectedCoins([]); // Limpiar monedas si escribe manualmente
-                        setChangeSuggestionIndex(0); // Reset suggestion index on payment change
-                      }}
-                      className="w-full px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="💵 O escribe el monto..."
+                        value={payment}
+                        onChange={(e) => {
+                          setPayment(e.target.value);
+                          setSelectedCoins([]); // Limpiar monedas si escribe manualmente
+                          setChangeSuggestionIndex(0); // Reset suggestion index on payment change
+                        }}
+                        className="flex-1 px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {parseFloat(payment) > total && (
+                        <button
+                          onClick={() => {
+                            const cambio = parseFloat(payment) - total;
+                            generarSugerenciasCambio(cambio);
+                            setShowChangeSuggestionModal(true);
+                          }}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                          title="Ver sugerencias de cambio"
+                        >
+                          💡
+                        </button>
+                      )}
+                    </div>
                   </>
                 )}
               </div>
@@ -693,6 +780,87 @@ export default function VentasPage() {
               }`}
             >
               ✅ Agregar al Carrito
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de sugerencias de cambio */}
+      {showChangeSuggestionModal && changeSuggestions.length > 0 && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">💡 Sugerencias de Cambio</h2>
+              <button
+                onClick={() => setShowChangeSuggestionModal(false)}
+                className="text-3xl hover:scale-110 transition-transform"
+              >
+                ✖️
+              </button>
+            </div>
+
+            <div className="bg-purple-100 rounded-2xl p-4 mb-4">
+              <div className="flex justify-between items-center">
+                <span className="text-xl font-semibold text-purple-900">Cambio a entregar:</span>
+                <span className="text-3xl font-bold text-purple-600">
+                  {formatCurrency(parseFloat(payment) - total)}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 rounded-2xl p-6 border-4 border-yellow-400">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-yellow-900">
+                  Opción {currentSuggestionIndex + 1} de {changeSuggestions.length}
+                </h3>
+              </div>
+
+              <div className="flex flex-wrap gap-2 items-center justify-center mb-4 bg-white p-4 rounded-xl">
+                {Object.entries(changeSuggestions[currentSuggestionIndex]).map(([valor, cantidad]) => {
+                  if (cantidad === 0) return null;
+                  return Array.from({ length: cantidad }).map((_, i) => (
+                    <img
+                      key={`${valor}-${i}`}
+                      src={getMonedaImage(parseFloat(valor))}
+                      alt={formatCurrency(parseFloat(valor))}
+                      className="w-16 h-16 object-contain"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ));
+                })}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    setCurrentSuggestionIndex((prev) => 
+                      prev > 0 ? prev - 1 : changeSuggestions.length - 1
+                    );
+                  }}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-xl text-lg font-bold transition-colors"
+                >
+                  ⬅️ Anterior
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentSuggestionIndex((prev) => 
+                      (prev + 1) % changeSuggestions.length
+                    );
+                  }}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-xl text-lg font-bold transition-colors"
+                >
+                  Siguiente ➡️
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowChangeSuggestionModal(false)}
+              className="w-full mt-6 bg-blue-500 hover:bg-blue-600 text-white px-6 py-4 rounded-xl text-xl font-bold transition-colors"
+            >
+              ✅ Cerrar
             </button>
           </div>
         </div>
