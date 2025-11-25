@@ -86,15 +86,9 @@ export default function VentasPage() {
     
     loadProducts();
     
-    // Cargar carrito desde localStorage
-    const savedCart = localStorage.getItem('ventas_cart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error('Error loading cart from localStorage:', e);
-      }
-    }
+    // Limpiar carrito al iniciar
+    localStorage.removeItem('ventas_cart');
+    setCart([]);
     
     // Recibir monedas seleccionadas desde URL
     const pagoFromUrl = searchParams.get('pago');
@@ -386,11 +380,6 @@ export default function VentasPage() {
     
     setChangeSuggestions(sugerencias);
     setCurrentSuggestionIndex(0);
-  };
-
-  const getMonedaImage = (valor: number): string => {
-    const denom = DENOMINACIONES.find(d => d.valor === valor);
-    return denom?.imagen || `/monedas/${valor}.png`;
   };
 
   async function handleCompleteSale() {
@@ -702,23 +691,23 @@ export default function VentasPage() {
                         onChange={(e) => {
                           setPayment(e.target.value);
                           setSelectedCoins([]); // Limpiar monedas si escribe manualmente
-                          setChangeSuggestionIndex(0); // Reset suggestion index on payment change
+                        setChangeSuggestionIndex(0); // Reset suggestion index on payment change
+                      }}
+                      className="flex-1 px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {parseFloat(payment) > calculateTotal() && (
+                      <button
+                        onClick={() => {
+                          const cambio = parseFloat(payment) - calculateTotal();
+                          generarSugerenciasCambio(cambio);
+                          setShowChangeSuggestionModal(true);
                         }}
-                        className="flex-1 px-6 py-3 text-lg border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      {parseFloat(payment) > total && (
-                        <button
-                          onClick={() => {
-                            const cambio = parseFloat(payment) - total;
-                            generarSugerenciasCambio(cambio);
-                            setShowChangeSuggestionModal(true);
-                          }}
-                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
-                          title="Ver sugerencias de cambio"
-                        >
-                          💡
-                        </button>
-                      )}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                        title="Ver sugerencias de cambio"
+                      >
+                        💡
+                      </button>
+                    )}
                     </div>
                   </>
                 )}
@@ -803,7 +792,7 @@ export default function VentasPage() {
               <div className="flex justify-between items-center">
                 <span className="text-xl font-semibold text-purple-900">Cambio a entregar:</span>
                 <span className="text-3xl font-bold text-purple-600">
-                  {formatCurrency(parseFloat(payment) - total)}
+                  {formatCurrency(parseFloat(payment) - calculateTotal())}
                 </span>
               </div>
             </div>
