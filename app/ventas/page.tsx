@@ -86,9 +86,15 @@ export default function VentasPage() {
     
     loadProducts();
     
-    // Limpiar carrito al iniciar
-    localStorage.removeItem('ventas_cart');
-    setCart([]);
+    // Cargar carrito desde localStorage si existe
+    const savedCart = localStorage.getItem('ventas_cart');
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (e) {
+        console.error('Error loading cart from localStorage:', e);
+      }
+    }
     
     // Recibir monedas seleccionadas desde URL
     const pagoFromUrl = searchParams.get('pago');
@@ -109,6 +115,8 @@ export default function VentasPage() {
   useEffect(() => {
     if (cart.length > 0) {
       localStorage.setItem('ventas_cart', JSON.stringify(cart));
+    } else {
+      localStorage.removeItem('ventas_cart');
     }
   }, [cart]);
 
