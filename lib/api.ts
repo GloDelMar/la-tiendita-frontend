@@ -253,8 +253,11 @@ export const debtorsApi = {
     return res.json();
   },
   
-  pay: async (id: number, monto: number) => {
-    const res = await fetch(`${API_URL}/api/debtors/${id}/pay?monto=${monto}`, {
+  pay: async (id: number, monto: number, cajaId?: number) => {
+    const params = new URLSearchParams({ monto: monto.toString() });
+    if (cajaId) params.append('caja_id', cajaId.toString());
+    
+    const res = await fetch(`${API_URL}/api/debtors/${id}/pay?${params}`, {
       method: 'PATCH',
     });
     if (!res.ok) throw new Error('Error al registrar pago');

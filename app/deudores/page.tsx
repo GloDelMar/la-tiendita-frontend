@@ -67,7 +67,7 @@ export default function DeudoresPage() {
     }
 
     try {
-      const response = await debtorsApi.pay(selectedDebtor.id, amount);
+      const response = await debtorsApi.pay(selectedDebtor.id, amount, selectedCaja?.id);
       setShowPayModal(false);
       setSelectedDebtor(null);
       setPaymentAmount('');
