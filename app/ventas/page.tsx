@@ -69,6 +69,8 @@ export default function VentasPage() {
     { nombre: 'Maestra Rocío', grupo: 'Preescolar' },
     { nombre: 'Maestra Gloriela', grupo: 'Taller Laboral' },
     { nombre: 'Maestro Emmanuel', grupo: 'Educación Física' },
+    { nombre: 'Maestra Gaby', grupo: 'Directora' },
+    { nombre: 'Maestra Carito', grupo: 'Cocina' },
   ];
 
   // Helper para obtener el nombre correcto de la imagen de moneda
