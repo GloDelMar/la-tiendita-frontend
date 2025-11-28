@@ -395,9 +395,17 @@ export default function VentasPage() {
     console.log('[VENTAS] - cart.length:', cart.length);
     console.log('[VENTAS] - isCredit:', isCredit);
     console.log('[VENTAS] - payment:', payment);
+    console.log('[VENTAS] - cliente:', cliente);
+    console.log('[VENTAS] - grupo:', grupo);
     
     if (cart.length === 0) {
       console.log('[VENTAS] ❌ Carrito vacío');
+      return;
+    }
+
+    if (isCredit && !cliente) {
+      console.log('[VENTAS] ❌ Falta seleccionar cliente para crédito');
+      alert('Por favor selecciona un cliente para la venta a crédito');
       return;
     }
 
