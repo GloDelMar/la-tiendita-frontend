@@ -512,16 +512,16 @@ export default function VentasPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-2 sm:p-4 md:p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-2 sm:p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
         {/* Productos */}
         <div className="lg:col-span-2">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 flex items-center gap-2 sm:gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
               🛒 <span>Nueva Venta</span>
             </h1>
-            <div className="bg-blue-100 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg w-full sm:w-auto text-center">
-              <span className="text-xs sm:text-sm font-semibold text-blue-900">Caja: {selectedCaja?.nombre}</span>
+            <div className="bg-blue-100 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg w-full sm:w-auto text-center lg:hidden">
+              <span className="text-xs font-semibold text-blue-900">Caja: {selectedCaja?.nombre}</span>
             </div>
           </div>
 
@@ -531,27 +531,27 @@ export default function VentasPage() {
             placeholder="🔍 Buscar producto..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-base sm:text-lg md:text-xl border-2 sm:border-3 md:border-4 border-gray-300 rounded-xl sm:rounded-2xl mb-4 sm:mb-6 focus:ring-2 sm:focus:ring-4 focus:ring-blue-500 focus:border-blue-500 shadow-lg"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-gray-300 rounded-lg sm:rounded-xl mb-3 sm:mb-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
 
           {/* Grid de productos */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
                 onClick={() => openQuantityModal(product)}
-                className="bg-white rounded-lg sm:rounded-xl md:rounded-2xl shadow-lg p-2 sm:p-3 md:p-4 lg:p-6 cursor-pointer hover:shadow-2xl hover:scale-105 transition-all border-2 sm:border-3 md:border-4 border-transparent hover:border-blue-400"
+                className="bg-white rounded-lg sm:rounded-xl shadow-md p-2 sm:p-3 cursor-pointer hover:shadow-xl hover:scale-105 transition-all border border-transparent hover:border-blue-400"
               >
-                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg sm:rounded-xl mb-2 sm:mb-3 md:mb-4 flex items-center justify-center overflow-hidden">
+                <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-md sm:rounded-lg mb-1.5 sm:mb-2 flex items-center justify-center overflow-hidden">
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.nombre} className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl">📦</span>
+                    <span className="text-2xl sm:text-4xl">📦</span>
                   )}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1 sm:mb-2 text-xs sm:text-sm md:text-base lg:text-lg line-clamp-2">{product.nombre}</h3>
-                <p className="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-blue-600 mb-1">{formatCurrency(product.precio)}</p>
-                <p className="text-xs sm:text-sm text-gray-600 bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full inline-block">
+                <h3 className="font-semibold text-gray-900 mb-0.5 sm:mb-1 text-xs sm:text-sm leading-tight line-clamp-2">{product.nombre}</h3>
+                <p className="text-sm sm:text-lg font-bold text-blue-600 mb-0.5">{formatCurrency(product.precio)}</p>
+                <p className="text-[10px] sm:text-xs text-gray-600 bg-gray-100 px-1.5 sm:px-2 py-0.5 rounded-full inline-block">
                   Stock: {product.stock}
                 </p>
               </div>
@@ -560,41 +560,41 @@ export default function VentasPage() {
         </div>
 
         {/* Carrito */}
-        <div className="lg:sticky lg:top-6 lg:h-fit">
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl p-3 sm:p-4 md:p-6 border-2 sm:border-3 md:border-4 border-blue-200">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 md:mb-6 flex items-center gap-2">
+        <div className="lg:sticky lg:top-20 lg:h-fit">
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-xl p-3 sm:p-4 border border-blue-200">
+            <h2 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 flex items-center gap-1.5 sm:gap-2">
               🛍️ <span>Carrito</span>
             </h2>
 
             {cart.length === 0 ? (
-              <div className="text-center py-6 sm:py-8 md:py-12">
-                <div className="text-4xl sm:text-5xl md:text-6xl mb-2 sm:mb-3 md:mb-4">🛒</div>
-                <p className="text-gray-500 text-base sm:text-lg md:text-xl">Carrito vacío</p>
+              <div className="text-center py-6 sm:py-8">
+                <div className="text-3xl sm:text-5xl mb-2">🛒</div>
+                <p className="text-gray-500 text-sm sm:text-base">Carrito vacío</p>
               </div>
             ) : (
-              <div className="max-h-[300px] sm:max-h-[350px] md:max-h-[400px] overflow-y-auto space-y-2 sm:space-y-3 md:space-y-4 mb-4 sm:mb-6 pr-1 sm:pr-2">
+              <div className="max-h-[250px] sm:max-h-[300px] lg:max-h-[350px] overflow-y-auto space-y-2 mb-3 sm:mb-4 pr-1">
                 {cart.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 sm:gap-3 md:gap-4 p-2 sm:p-3 md:p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg sm:rounded-xl border-2 border-blue-200">
+                  <div key={index} className="flex items-center gap-2 p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-sm sm:text-base md:text-lg truncate">{item.product.nombre}</p>
-                      <p className="text-base sm:text-lg md:text-xl text-blue-600 font-semibold">{formatCurrency(item.product.precio)}</p>
+                      <p className="font-semibold text-xs sm:text-sm truncate">{item.product.nombre}</p>
+                      <p className="text-sm sm:text-base text-blue-600 font-semibold">{formatCurrency(item.product.precio)}</p>
                     </div>
-                    <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+                    <div className="flex items-center gap-1 sm:gap-1.5">
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-red-500 hover:bg-red-600 text-white rounded-lg sm:rounded-xl text-lg sm:text-xl md:text-2xl font-bold flex items-center justify-center"
+                        className="w-7 h-7 sm:w-8 sm:h-8 bg-red-500 hover:bg-red-600 text-white rounded-md text-base sm:text-lg font-bold flex items-center justify-center"
                       >
                         −
                       </button>
                       <button
                         onClick={() => openQuantityModal(item.product)}
-                        className="w-12 sm:w-14 md:w-16 text-center font-bold text-xl sm:text-2xl md:text-3xl bg-white rounded-lg sm:rounded-xl py-1 sm:py-2 border-2 border-blue-300 hover:border-blue-500"
+                        className="w-10 sm:w-12 text-center font-bold text-base sm:text-xl bg-white rounded-md py-1 border border-blue-300 hover:border-blue-500"
                       >
                         {item.quantity}
                       </button>
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-green-500 hover:bg-green-600 text-white rounded-lg sm:rounded-xl text-lg sm:text-xl md:text-2xl font-bold flex items-center justify-center"
+                        className="w-7 h-7 sm:w-8 sm:h-8 bg-green-500 hover:bg-green-600 text-white rounded-md text-base sm:text-lg font-bold flex items-center justify-center"
                       >
                         +
                       </button>
@@ -610,13 +610,13 @@ export default function VentasPage() {
               </div>
             )}
 
-            <div className="border-t-2 sm:border-t-3 md:border-t-4 border-blue-300 pt-3 sm:pt-4 md:pt-6 mb-3 sm:mb-4 md:mb-6">
-              <div className="flex justify-between items-center bg-gradient-to-r from-blue-100 to-purple-100 p-3 sm:p-4 rounded-xl mb-3 sm:mb-4 md:mb-6">
-                <span className="text-lg sm:text-xl md:text-2xl font-bold">Total:</span>
-                <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-600">{formatCurrency(calculateTotal())}</span>
+            <div className="border-t-2 border-blue-300 pt-3 mb-3">
+              <div className="flex justify-between items-center bg-gradient-to-r from-blue-100 to-purple-100 p-2 sm:p-3 rounded-lg mb-3">
+                <span className="text-sm sm:text-base font-bold">Total:</span>
+                <span className="text-xl sm:text-2xl font-bold text-blue-600">{formatCurrency(calculateTotal())}</span>
               </div>
 
-              <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-2 sm:space-y-3">
                 {/* Selector de Cliente */}
                 {showCustomClientInput ? (
                   <div className="space-y-2">
@@ -625,14 +625,14 @@ export default function VentasPage() {
                       placeholder="👤 Nombre del cliente"
                       value={cliente}
                       onChange={(e) => setCliente(e.target.value)}
-                      className="w-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base md:text-lg border-2 border-gray-300 rounded-xl focus:ring-2 sm:focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <input
                       type="text"
                       placeholder="👥 Grupo (opcional)"
                       value={grupo}
                       onChange={(e) => setGrupo(e.target.value)}
-                      className="w-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base md:text-lg border-2 border-gray-300 rounded-xl focus:ring-2 sm:focus:ring-4 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <button
                       onClick={() => {
@@ -640,7 +640,7 @@ export default function VentasPage() {
                         setCliente('');
                         setGrupo('');
                       }}
-                      className="text-sm text-blue-600 hover:text-blue-800"
+                      className="text-xs sm:text-sm text-blue-600 hover:text-blue-800"
                     >
                       ← Volver a lista de maestros
                     </button>
@@ -663,7 +663,7 @@ export default function VentasPage() {
                           setGrupo('');
                         }
                       }}
-                      className="w-full px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3 text-sm sm:text-base md:text-lg border-2 border-gray-300 rounded-xl focus:ring-2 sm:focus:ring-4 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                      className="w-full px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                     >
                       <option value="">👤 Seleccionar maestro (opcional)</option>
                       {maestrosConCredito.map((maestro, idx) => (
@@ -674,8 +674,8 @@ export default function VentasPage() {
                       <option value="custom">✏️ Otro cliente...</option>
                     </select>
                     {cliente && (
-                      <div className="bg-blue-50 px-4 py-2 rounded-lg">
-                        <p className="text-sm text-blue-900">
+                      <div className="bg-blue-50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md">
+                        <p className="text-xs sm:text-sm text-blue-900">
                           <strong>{cliente}</strong> - {grupo}
                         </p>
                       </div>
@@ -736,7 +736,7 @@ export default function VentasPage() {
             <button
               onClick={handleCompleteSale}
               disabled={cart.length === 0}
-              className={`w-full py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl md:text-2xl shadow-lg transition-all ${
+              className={`w-full py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg shadow-lg transition-all ${
                 cart.length === 0
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:scale-105'
