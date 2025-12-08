@@ -812,35 +812,35 @@ export default function VentasPage() {
 
       {/* Modal de sugerencias de cambio */}
       {showChangeSuggestionModal && changeSuggestions.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">💡 Sugerencias de Cambio</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-xl sm:rounded-2xl max-w-2xl w-full p-3 sm:p-4 md:p-6 my-4 max-h-[95vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900">💡 Sugerencias de Cambio</h2>
               <button
                 onClick={() => setShowChangeSuggestionModal(false)}
-                className="text-3xl hover:scale-110 transition-transform"
+                className="text-2xl sm:text-3xl hover:scale-110 transition-transform"
               >
                 ✖️
               </button>
             </div>
 
-            <div className="bg-purple-100 rounded-2xl p-4 mb-4">
-              <div className="flex justify-between items-center">
-                <span className="text-xl font-semibold text-purple-900">Cambio a entregar:</span>
-                <span className="text-3xl font-bold text-purple-600">
+            <div className="bg-purple-100 rounded-lg sm:rounded-xl p-2 sm:p-3 md:p-4 mb-3 sm:mb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-1 sm:gap-2">
+                <span className="text-xs sm:text-sm md:text-base font-semibold text-purple-900">Cambio a entregar:</span>
+                <span className="text-lg sm:text-2xl md:text-3xl font-bold text-purple-600">
                   {formatCurrency(parseFloat(payment) - calculateTotal())}
                 </span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 rounded-2xl p-6 border-4 border-yellow-400">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold text-yellow-900">
+            <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 rounded-lg sm:rounded-xl md:rounded-2xl p-3 sm:p-4 md:p-6 border-2 sm:border-3 md:border-4 border-yellow-400">
+              <div className="flex justify-between items-center mb-3 sm:mb-4">
+                <h3 className="text-sm sm:text-base md:text-lg font-bold text-yellow-900">
                   Opción {currentSuggestionIndex + 1} de {changeSuggestions.length}
                 </h3>
               </div>
 
-              <div className="flex flex-wrap gap-2 items-center justify-center mb-4 bg-white p-4 rounded-xl">
+              <div className="flex flex-wrap gap-1 sm:gap-1.5 md:gap-2 items-center justify-center mb-3 sm:mb-4 bg-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl min-h-[80px] sm:min-h-[100px]">
                 {Object.entries(changeSuggestions[currentSuggestionIndex]).map(([valor, cantidad]) => {
                   if (cantidad === 0) return null;
                   return Array.from({ length: cantidad }).map((_, i) => (
@@ -848,7 +848,7 @@ export default function VentasPage() {
                       key={`${valor}-${i}`}
                       src={getMonedaImage(parseFloat(valor))}
                       alt={formatCurrency(parseFloat(valor))}
-                      className="w-16 h-16 object-contain"
+                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
@@ -857,14 +857,14 @@ export default function VentasPage() {
                 })}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 <button
                   onClick={() => {
                     setCurrentSuggestionIndex((prev) => 
                       prev > 0 ? prev - 1 : changeSuggestions.length - 1
                     );
                   }}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-xl text-lg font-bold transition-colors"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base md:text-lg font-bold transition-colors"
                 >
                   ⬅️ Anterior
                 </button>
@@ -874,7 +874,7 @@ export default function VentasPage() {
                       (prev + 1) % changeSuggestions.length
                     );
                   }}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-xl text-lg font-bold transition-colors"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 sm:px-3 md:px-4 py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base md:text-lg font-bold transition-colors"
                 >
                   Siguiente ➡️
                 </button>
@@ -883,7 +883,7 @@ export default function VentasPage() {
 
             <button
               onClick={() => setShowChangeSuggestionModal(false)}
-              className="w-full mt-6 bg-blue-500 hover:bg-blue-600 text-white px-6 py-4 rounded-xl text-xl font-bold transition-colors"
+              className="w-full mt-3 sm:mt-4 md:mt-6 bg-blue-500 hover:bg-blue-600 text-white px-3 sm:px-4 md:px-6 py-2.5 sm:py-3 md:py-4 rounded-lg sm:rounded-xl text-sm sm:text-base md:text-lg font-bold transition-colors"
             >
               ✅ Cerrar
             </button>
