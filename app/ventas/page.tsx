@@ -43,6 +43,7 @@ export default function VentasPage() {
   const [showChangeSuggestionModal, setShowChangeSuggestionModal] = useState(false);
   const [changeSuggestions, setChangeSuggestions] = useState<Array<{ [key: number]: number }>>([]);
   const [currentSuggestionIndex, setCurrentSuggestionIndex] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Denominaciones de monedas y billetes
   const DENOMINACIONES = [
@@ -395,6 +396,13 @@ export default function VentasPage() {
 
   async function handleCompleteSale() {
     console.log('[VENTAS] 🚀 handleCompleteSale iniciado');
+    
+    // Prevenir múltiples ejecuciones
+    if (isProcessing) {
+      console.log('[VENTAS] ⏳ Ya se está procesando una venta');
+      return;
+    }
+
     console.log('[VENTAS] - cart.length:', cart.length);
     console.log('[VENTAS] - isCredit:', isCredit);
     console.log('[VENTAS] - payment:', payment);
@@ -417,6 +425,9 @@ export default function VentasPage() {
       alert('Por favor ingresa el monto del pago');
       return;
     }
+
+    // Activar estado de procesamiento
+    setIsProcessing(true);
 
     const total = calculateTotal();
     const paymentAmount = isCredit ? 0 : parseFloat(payment);
@@ -484,9 +495,15 @@ export default function VentasPage() {
       loadProducts();
       
       console.log('[VENTAS] 🎉 Venta completada exitosamente');
+      
+      // Desactivar estado de procesamiento después del éxito
+      setIsProcessing(false);
     } catch (error) {
       console.error('[VENTAS] ❌ Error completing sale:', error);
       alert('Error al completar la venta');
+      
+      // Desactivar estado de procesamiento en caso de error
+      setIsProcessing(false);
     }
   }
 
@@ -735,14 +752,14 @@ export default function VentasPage() {
 
             <button
               onClick={handleCompleteSale}
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || isProcessing}
               className={`w-full py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg shadow-lg transition-all ${
-                cart.length === 0
+                cart.length === 0 || isProcessing
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white hover:scale-105'
               }`}
             >
-              ✅ Completar Venta
+              {isProcessing ? '⏳ Procesando...' : '✅ Completar Venta'}
             </button>
           </div>
         </div>
