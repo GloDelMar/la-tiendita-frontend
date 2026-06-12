@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { productsApi, transactionsApi } from '@/lib/api';
+import { productsApi, transactionsApi, debtorsApi, resolveImageUrl, resolveProductImageUrl } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import NumeroSelector from '@/components/NumeroSelector';
 import { downloadReceipt, printReceipt } from '@/lib/receiptGenerator';
@@ -561,7 +561,19 @@ export default function VentasPage() {
               >
                 <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-md sm:rounded-lg mb-1.5 sm:mb-2 flex items-center justify-center overflow-hidden">
                   {product.image_url ? (
-                    <img src={product.image_url} alt={product.nombre} className="w-full h-full object-cover" />
+                    <img
+                      src={resolveProductImageUrl(product.id, product.image_url)}
+                      alt={product.nombre}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const fallback = resolveImageUrl(product.image_url);
+                        if (fallback && e.currentTarget.src !== fallback) {
+                          e.currentTarget.src = fallback;
+                          return;
+                        }
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
                   ) : (
                     <span className="text-2xl sm:text-4xl">📦</span>
                   )}

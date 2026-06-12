@@ -5,7 +5,7 @@ import Navigation from "@/components/Navigation";
 import AuthGuard from "@/components/AuthGuard";
 import { CajaProvider } from "@/contexts/CajaContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", preload: false });
 
 export const metadata: Metadata = {
   title: "La Tiendita POS",
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${inter.variable}`}>
         <AuthGuard>
           <CajaProvider>
             <div className="min-h-screen bg-gray-50">

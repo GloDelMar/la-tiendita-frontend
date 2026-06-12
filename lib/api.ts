@@ -1,5 +1,29 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+export function resolveProductImageUrl(productId: number, imageUrl?: string | null): string {
+  if (!imageUrl) return '';
+  return `${API_URL}/api/products/${productId}/image`;
+}
+
+export function resolveImageUrl(imageUrl?: string | null): string {
+  if (!imageUrl) return '';
+
+  // URLs absolutas (S3, CDN, etc.)
+  if (/^https?:\/\//i.test(imageUrl)) {
+    return imageUrl;
+  }
+
+  // Rutas locales del backend (/static/... o static/...)
+  if (/^\/?static\//i.test(imageUrl)) {
+    const normalized = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    return `${API_URL}${normalized}`;
+  }
+
+  // Fallback para otras rutas relativas
+  const normalized = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+  return `${API_URL}${normalized}`;
+}
+
 // Cajas
 export const cajasApi = {
   getAll: async (activaOnly: boolean = false) => {

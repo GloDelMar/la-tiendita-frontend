@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { productsApi, cajasApi } from '@/lib/api';
+import { productsApi, cajasApi, resolveImageUrl, resolveProductImageUrl } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
 import { useCaja } from '@/contexts/CajaContext';
 
@@ -172,7 +172,19 @@ export default function ProductsPage() {
           <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             <div className="h-48 bg-gray-100 flex items-center justify-center">
               {product.image_url ? (
-                <img src={product.image_url} alt={product.name} className="h-full w-full object-contain" />
+                <img
+                  src={resolveProductImageUrl(product.id, product.image_url)}
+                  alt={product.name}
+                  className="h-full w-full object-contain"
+                  onError={(e) => {
+                    const fallback = resolveImageUrl(product.image_url);
+                    if (fallback && e.currentTarget.src !== fallback) {
+                      e.currentTarget.src = fallback;
+                      return;
+                    }
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
               ) : (
                 <span className="text-6xl">📦</span>
               )}
