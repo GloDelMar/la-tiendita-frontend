@@ -564,7 +564,7 @@ export default function VentasPage() {
                     <img
                       src={resolveProductImageUrl(product.id, product.image_url)}
                       alt={product.nombre}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         const fallback = resolveImageUrl(product.image_url);
                         if (fallback && e.currentTarget.src !== fallback) {
