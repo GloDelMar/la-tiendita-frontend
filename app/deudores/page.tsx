@@ -107,28 +107,28 @@ export default function DeudoresPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--cafe-dark)]"></div>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Deudores</h1>
+      <h1 className="text-3xl font-black text-[var(--ink)] mb-8">Deudores</h1>
 
       {/* Resumen */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <p className="text-sm text-gray-600 mb-2">Total Deudores</p>
-          <p className="text-3xl font-bold text-gray-900">{summary.total_deudores}</p>
+        <div className="bg-[var(--cream)] rounded-2xl shadow-sm p-6 border border-[var(--sand-strong)]/50">
+          <p className="text-sm text-[var(--ink-soft)] mb-2">Total Deudores</p>
+          <p className="text-3xl font-bold text-[var(--ink)]">{summary.total_deudores}</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <p className="text-sm text-gray-600 mb-2">Total Deuda</p>
-          <p className="text-3xl font-bold text-red-600">{formatCurrency(summary.total_deuda)}</p>
+        <div className="bg-[var(--cream)] rounded-2xl shadow-sm p-6 border border-[var(--sand-strong)]/50">
+          <p className="text-sm text-[var(--ink-soft)] mb-2">Total Deuda</p>
+          <p className="text-3xl font-bold text-[var(--accent-coral)]">{formatCurrency(summary.total_deuda)}</p>
         </div>
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <p className="text-sm text-gray-600 mb-2">Promedio por Deudor</p>
-          <p className="text-3xl font-bold text-orange-600">{formatCurrency(summary.promedio_deuda)}</p>
+        <div className="bg-[var(--cream)] rounded-2xl shadow-sm p-6 border border-[var(--sand-strong)]/50">
+          <p className="text-sm text-[var(--ink-soft)] mb-2">Promedio por Deudor</p>
+          <p className="text-3xl font-bold text-[var(--accent-honey)]">{formatCurrency(summary.promedio_deuda)}</p>
         </div>
       </div>
 
@@ -138,19 +138,19 @@ export default function DeudoresPage() {
         placeholder="Buscar por nombre o grupo..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg mb-6 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-full px-4 py-3 border border-[var(--sand-strong)] rounded-xl mb-6 focus:ring-2 focus:ring-[var(--cafe-dark)] focus:border-transparent bg-[var(--cream)]"
       />
 
       {/* Lista de deudores */}
       {filteredDebtors.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-          <p className="text-gray-500 text-lg">No hay deudores registrados</p>
+        <div className="text-center py-12 bg-[var(--cream)] rounded-2xl shadow-sm border border-[var(--sand-strong)]/40">
+          <p className="text-[var(--ink-soft)] text-lg">No hay deudores registrados</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-[var(--cream)] rounded-2xl shadow-sm overflow-hidden border border-[var(--sand-strong)]/40">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-[var(--beige)] border-b border-[var(--sand-strong)]/40">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Cliente
@@ -169,33 +169,33 @@ export default function DeudoresPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-[var(--sand-strong)]/30">
                 {filteredDebtors.map((debtor) => (
-                  <tr key={debtor.id} className="hover:bg-gray-50">
+                  <tr key={debtor.id} className="hover:bg-[var(--beige)]/50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="font-medium text-gray-900">{debtor.nombre}</p>
+                      <p className="font-medium text-[var(--ink)]">{debtor.nombre}</p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                      <span className="px-2 py-1 text-xs rounded-full bg-[var(--sand)]/50 text-[var(--ink)]">
                         {debtor.grupo}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-lg font-bold text-red-600">{formatCurrency(debtor.deuda)}</p>
+                      <p className="text-lg font-bold text-[var(--accent-coral)]">{formatCurrency(debtor.deuda)}</p>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[var(--ink-soft)]">
                       {formatDate(debtor.ultima_compra)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => openPayModal(debtor)}
-                        className="text-green-600 hover:text-green-900 mr-4"
+                        className="text-[var(--accent-leaf)] hover:text-[#2f6f4e] mr-4"
                       >
                         Pagar
                       </button>
                       <button
                         onClick={() => handleDelete(debtor.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-[var(--accent-coral)] hover:text-[#b95032]"
                       >
                         Eliminar
                       </button>
@@ -211,18 +211,18 @@ export default function DeudoresPage() {
       {/* Modal de pago */}
       {showPayModal && selectedDebtor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold mb-4">Registrar Pago</h2>
+          <div className="bg-[var(--cream)] rounded-2xl max-w-md w-full p-6 border border-[var(--sand-strong)]">
+            <h2 className="text-2xl font-bold mb-4 text-[var(--ink)]">Registrar Pago</h2>
             <div className="mb-4">
-              <p className="text-sm text-gray-600">Cliente</p>
-              <p className="text-lg font-medium">{selectedDebtor.nombre}</p>
+              <p className="text-sm text-[var(--ink-soft)]">Cliente</p>
+              <p className="text-lg font-medium text-[var(--ink)]">{selectedDebtor.nombre}</p>
             </div>
             <div className="mb-4">
-              <p className="text-sm text-gray-600">Deuda actual</p>
-              <p className="text-2xl font-bold text-red-600">{formatCurrency(selectedDebtor.deuda)}</p>
+              <p className="text-sm text-[var(--ink-soft)]">Deuda actual</p>
+              <p className="text-2xl font-bold text-[var(--accent-coral)]">{formatCurrency(selectedDebtor.deuda)}</p>
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[var(--ink-soft)] mb-2">
                 Monto a pagar
               </label>
               <input
@@ -230,20 +230,20 @@ export default function DeudoresPage() {
                 step="0.01"
                 value={paymentAmount}
                 onChange={(e) => setPaymentAmount(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-[var(--sand-strong)] rounded-lg focus:ring-2 focus:ring-[var(--cafe-dark)] focus:border-transparent"
                 placeholder="0.00"
                 max={selectedDebtor.deuda}
               />
               <div className="mt-2 flex gap-2">
                 <button
                   onClick={() => setPaymentAmount((selectedDebtor.deuda / 2).toFixed(2))}
-                  className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                  className="px-3 py-1 text-xs bg-[var(--sand)]/35 hover:bg-[var(--sand)]/55 rounded"
                 >
                   50%
                 </button>
                 <button
                   onClick={() => setPaymentAmount(selectedDebtor.deuda.toFixed(2))}
-                  className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                  className="px-3 py-1 text-xs bg-[var(--sand)]/35 hover:bg-[var(--sand)]/55 rounded"
                 >
                   Total
                 </button>
@@ -256,13 +256,13 @@ export default function DeudoresPage() {
                   setSelectedDebtor(null);
                   setPaymentAmount('');
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border border-[var(--sand-strong)] rounded-lg hover:bg-[var(--beige)]"
               >
                 Cancelar
               </button>
               <button
                 onClick={handlePayment}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                className="flex-1 bg-[linear-gradient(120deg,var(--cafe-dark)_0%,var(--cafe-mid)_100%)] hover:brightness-110 text-[var(--cream)] px-4 py-2 rounded-lg"
               >
                 Confirmar Pago
               </button>

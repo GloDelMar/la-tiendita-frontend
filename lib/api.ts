@@ -26,6 +26,12 @@ export function resolveImageUrl(imageUrl?: string | null): string {
 
 // Cajas
 export const cajasApi = {
+  getCurrent: async () => {
+    const res = await fetch(`${API_URL}/api/cajas/current`);
+    if (!res.ok) throw new Error('Error al obtener caja actual');
+    return res.json();
+  },
+
   getAll: async (activaOnly: boolean = false) => {
     const params = activaOnly ? '?activa_only=true' : '';
     const res = await fetch(`${API_URL}/api/cajas/${params}`);
@@ -104,7 +110,19 @@ export const productsApi = {
     return res.json();
   },
   
-  create: async (product: { name: string; price: number; image_url?: string; caja_id?: number }) => {
+  create: async (product: {
+    name: string;
+    price: number;
+    category: 'bebidas' | 'alimentos' | 'postres';
+    option_groups?: Array<{
+      key: string;
+      label: string;
+      selection_type: 'single' | 'multiple';
+      choices: string[];
+    }>;
+    image_url?: string;
+    caja_id?: number;
+  }) => {
     const res = await fetch(`${API_URL}/api/products`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -114,7 +132,19 @@ export const productsApi = {
     return res.json();
   },
   
-  update: async (id: number, product: Partial<{ name: string; price: number; image_url: string; caja_id: number }>) => {
+  update: async (id: number, product: Partial<{
+    name: string;
+    price: number;
+    category: 'bebidas' | 'alimentos' | 'postres';
+    option_groups: Array<{
+      key: string;
+      label: string;
+      selection_type: 'single' | 'multiple';
+      choices: string[];
+    }>;
+    image_url: string;
+    caja_id: number;
+  }>) => {
     const res = await fetch(`${API_URL}/api/products/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -182,6 +212,11 @@ export const transactionsApi = {
       cantidad: number;
       precio_unitario: number;
       subtotal: number;
+      opciones?: Array<{
+        group_key: string;
+        group_label: string;
+        values: string[];
+      }>;
     }>;
     total: number;
     pago: number;
@@ -400,6 +435,31 @@ export const cashApi = {
     const queryString = params.toString();
     const res = await fetch(`${API_URL}/api/cash/stats/daily${queryString ? `?${queryString}` : ''}`);
     if (!res.ok) throw new Error('Error al obtener estadísticas');
+    return res.json();
+  },
+};
+
+// Documentos
+export const documentsApi = {
+  upload: async (payload: {
+    file: Blob;
+    filename: string;
+    category?: string;
+    reference_type?: string;
+    reference_id?: string;
+  }) => {
+    const formData = new FormData();
+    formData.append('file', payload.file, payload.filename);
+    formData.append('category', payload.category || 'general');
+    if (payload.reference_type) formData.append('reference_type', payload.reference_type);
+    if (payload.reference_id) formData.append('reference_id', payload.reference_id);
+
+    const res = await fetch(`${API_URL}/api/documents/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error('Error al subir documento');
     return res.json();
   },
 };

@@ -6,6 +6,11 @@ interface Product {
   cantidad: number;
   precio_unitario: number;
   subtotal: number;
+  opciones?: Array<{
+    group_key: string;
+    group_label: string;
+    values: string[];
+  }>;
 }
 
 interface Transaction {
@@ -47,7 +52,7 @@ export function generateReceipt(transaction: Transaction) {
   doc.text('Taller de Formación Laboral', 40, yPos, { align: 'center' });
   yPos += 5;
   doc.setFontSize(12);
-  doc.text('La Tiendita', 40, yPos, { align: 'center' });
+  doc.text('Cafeteria CAM 15', 40, yPos, { align: 'center' });
   
   yPos += 6;
   doc.setFontSize(8);
@@ -92,6 +97,13 @@ export function generateReceipt(transaction: Transaction) {
     // Nombre del producto
     doc.text(producto.nombre, 5, yPos);
     yPos += 4;
+
+    if (producto.opciones && producto.opciones.length > 0) {
+      producto.opciones.forEach((opcion) => {
+        doc.text(`   - ${opcion.group_label}: ${opcion.values.join(', ')}`, 5, yPos);
+        yPos += 3;
+      });
+    }
     
     // Cantidad y precio
     const linea = `  ${producto.cantidad} x $${producto.precio_unitario.toFixed(2)} = $${producto.subtotal.toFixed(2)}`;
@@ -142,6 +154,11 @@ export function printReceipt(transaction: Transaction) {
   window.open(doc.output('bloburl'), '_blank');
 }
 
+export function generateReceiptBlob(transaction: Transaction): Blob {
+  const doc = generateReceipt(transaction);
+  return doc.output('blob');
+}
+
 // Generar recibo consolidado para un maestro
 export function generateConsolidatedReceipt(
   maestro: string,
@@ -171,7 +188,7 @@ export function generateConsolidatedReceipt(
   doc.setFontSize(14);
   doc.text('Taller de Formación Laboral', 105, yPos + 12, { align: 'center' });
   doc.setFontSize(18);
-  doc.text('La Tiendita', 105, yPos + 20, { align: 'center' });
+  doc.text('Cafeteria CAM 15', 105, yPos + 20, { align: 'center' });
   
   yPos += 35;
   doc.setFontSize(12);
@@ -263,4 +280,13 @@ export function printConsolidatedReceipt(
   const doc = generateConsolidatedReceipt(maestro, grupo, transactions);
   doc.autoPrint();
   window.open(doc.output('bloburl'), '_blank');
+}
+
+export function generateConsolidatedReceiptBlob(
+  maestro: string,
+  grupo: string,
+  transactions: Transaction[]
+): Blob {
+  const doc = generateConsolidatedReceipt(maestro, grupo, transactions);
+  return doc.output('blob');
 }

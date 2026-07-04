@@ -26,18 +26,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 max-w-md w-full">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_18%_16%,rgba(242,182,70,0.35)_0,transparent_28%),radial-gradient(circle_at_82%_10%,rgba(232,111,74,0.28)_0,transparent_24%),linear-gradient(135deg,#f8e7d4_0%,#f2d6b7_45%,#ecc39f_100%)] flex items-center justify-center p-4">
+      <div className="bg-[var(--cream)] rounded-3xl shadow-2xl p-8 md:p-12 max-w-md w-full border border-[var(--sand-strong)]/50">
         {/* Logo y título */}
         <div className="text-center mb-8">
-          <div className="bg-gradient-to-br from-blue-600 to-purple-600 w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+          <div className="bg-[linear-gradient(140deg,var(--cafe-dark)_0%,var(--cafe-mid)_55%,#a2603b_100%)] w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
             <span className="text-5xl">🏪</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">La Tiendita</h1>
-          <p className="text-lg text-gray-600 font-medium">
-            Taller de Formación Laboral
+          <h1 className="text-3xl font-black text-[var(--ink)] mb-2">Cafetería CAM 15</h1>
+          <p className="text-lg text-[var(--ink-soft)] font-medium">
+            Espacio escolar alegre e inclusivo
           </p>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-[var(--ink-soft)]/80 mt-1">
             CAM15 - Nayarit
           </p>
         </div>
@@ -45,7 +45,7 @@ export default function LoginPage() {
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-semibold text-[var(--ink-soft)] mb-2">
               Contraseña de Acceso
             </label>
             <input
@@ -53,7 +53,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-4 py-3 border-2 border-[var(--sand-strong)] rounded-xl focus:ring-4 focus:ring-[var(--cafe-dark)]/20 focus:border-[var(--cafe-dark)] transition-all"
               placeholder="Ingresa la contraseña"
               required
               autoFocus
@@ -62,7 +62,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center gap-2">
+            <div className="bg-[rgba(232,111,74,0.12)] border-2 border-[rgba(232,111,74,0.35)] text-[var(--cafe-dark)] px-4 py-3 rounded-xl flex items-center gap-2">
               <span className="text-xl">⚠️</span>
               <span className="font-medium">{error}</span>
             </div>
@@ -71,7 +71,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            className="w-full bg-[linear-gradient(120deg,var(--cafe-dark)_0%,var(--cafe-mid)_50%,#a2603b_100%)] hover:brightness-110 text-[var(--cream)] font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -88,11 +88,11 @@ export default function LoginPage() {
         </form>
 
         {/* Footer */}
-        <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-          <p className="text-xs text-gray-500">
+        <div className="mt-8 pt-6 border-t border-[var(--sand-strong)]/50 text-center">
+          <p className="text-xs text-[var(--ink-soft)]">
             Sistema de Punto de Venta
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-[var(--ink-soft)]/70 mt-1">
             Ciclo Escolar 2025-2026
           </p>
         </div>
