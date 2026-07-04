@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { documentsApi, transactionsApi } from '@/lib/api';
+import { transactionsApi } from '@/lib/api';
 import { formatCurrency } from '@/lib/utils';
-import {
-  downloadConsolidatedReceipt,
-  downloadReceipt,
-  generateConsolidatedReceiptBlob,
-  generateReceiptBlob,
-} from '@/lib/receiptGenerator';
+import { downloadConsolidatedReceipt, printConsolidatedReceipt, downloadReceipt, printReceipt } from '@/lib/receiptGenerator';
 import { useCaja } from '@/contexts/CajaContext';
 
 const maestrosConCredito = [
@@ -107,7 +102,7 @@ export default function RecibosPage() {
     }
   }
 
-  async function handleGenerateConsolidatedReceipt() {
+  function handleGenerateConsolidatedReceipt(print: boolean) {
     if (!teacherSummary) return;
 
     // Filter only selected transactions
@@ -130,28 +125,14 @@ export default function RecibosPage() {
       pagado: t.pagado,
     }));
 
-    try {
-      const consolidatedBlob = generateConsolidatedReceiptBlob(
-        teacherSummary.teacher_name,
-        teacherSummary.grupo,
-        receiptTransactions
-      );
-      await documentsApi.upload({
-        file: consolidatedBlob,
-        filename: `recibo_consolidado_${teacherSummary.teacher_name.replace(/\s+/g, '_')}.pdf`,
-        category: 'tickets',
-        reference_type: 'teacher',
-        reference_id: teacherSummary.teacher_name,
-      });
-
+    if (print) {
+      printConsolidatedReceipt(teacherSummary.teacher_name, teacherSummary.grupo, receiptTransactions);
+    } else {
       downloadConsolidatedReceipt(teacherSummary.teacher_name, teacherSummary.grupo, receiptTransactions);
-    } catch (uploadError) {
-      console.error('No se pudo subir el recibo consolidado al bucket:', uploadError);
-      alert('No se pudo enviar el recibo consolidado al servidor.');
     }
   }
 
-  async function handleGenerateIndividualReceipt(transaction: any) {
+  function handleGenerateIndividualReceipt(transaction: any, print: boolean) {
     const receiptData = {
       id: transaction.id,
       fecha: transaction.fecha,
@@ -164,30 +145,20 @@ export default function RecibosPage() {
       pagado: transaction.pagado,
     };
 
-    try {
-      const receiptBlob = generateReceiptBlob(receiptData);
-      await documentsApi.upload({
-        file: receiptBlob,
-        filename: `ticket_${transaction.id}.pdf`,
-        category: 'tickets',
-        reference_type: 'transaction',
-        reference_id: String(transaction.id),
-      });
-
+    if (print) {
+      printReceipt(receiptData);
+    } else {
       downloadReceipt(receiptData);
-    } catch (uploadError) {
-      console.error('No se pudo subir el ticket al bucket:', uploadError);
-      alert(`No se pudo enviar el ticket #${transaction.id}.`);
     }
   }
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-black text-[var(--ink)] mb-8">📄 Gestión de Recibos</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">📄 Gestión de Recibos</h1>
 
       {/* Selector de modo de visualización */}
-      <div className="bg-[var(--cream)] rounded-2xl shadow-md p-6 mb-6 border border-[var(--sand-strong)]/40">
-        <h2 className="text-xl font-bold mb-4 text-[var(--ink)]">Tipo de Consulta</h2>
+      <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4">Tipo de Consulta</h2>
         <div className="flex gap-4 mb-4">
           <button
             onClick={() => {
@@ -197,8 +168,8 @@ export default function RecibosPage() {
             }}
             className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
               viewMode === 'maestros'
-                ? 'bg-[var(--cafe-dark)] text-[var(--cream)]'
-                : 'bg-[var(--beige)] text-[var(--ink)] hover:bg-[var(--sand)]/50'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             👨‍🏫 Por Maestro
@@ -212,8 +183,8 @@ export default function RecibosPage() {
             }}
             className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-colors ${
               viewMode === 'todas'
-                ? 'bg-[var(--cafe-dark)] text-[var(--cream)]'
-                : 'bg-[var(--beige)] text-[var(--ink)] hover:bg-[var(--sand)]/50'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             📋 Todas las Transacciones
@@ -222,12 +193,12 @@ export default function RecibosPage() {
 
         {viewMode === 'maestros' && (
           <>
-            <h3 className="text-lg font-semibold mb-3 text-[var(--ink)]">Seleccionar Maestro</h3>
+            <h3 className="text-lg font-semibold mb-3">Seleccionar Maestro</h3>
             <div className="flex gap-4">
               <select
                 value={selectedTeacher}
                 onChange={(e) => setSelectedTeacher(e.target.value)}
-                className="flex-1 px-4 py-3 border-2 border-[var(--sand-strong)] rounded-lg focus:ring-2 focus:ring-[var(--cafe-dark)] bg-[var(--cream)]"
+                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Seleccionar maestro...</option>
                 {maestrosConCredito.map((maestro, idx) => (
@@ -239,7 +210,7 @@ export default function RecibosPage() {
               <button
                 onClick={loadTeacherData}
                 disabled={!selectedTeacher || loading}
-                className="px-6 py-3 bg-[linear-gradient(120deg,var(--cafe-dark)_0%,var(--cafe-mid)_100%)] hover:brightness-110 text-[var(--cream)] font-bold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 {loading ? 'Cargando...' : 'Cargar Datos'}
               </button>
@@ -254,7 +225,7 @@ export default function RecibosPage() {
                     onChange={(e) => setShowOnlyUnpaid(e.target.checked)}
                     className="w-5 h-5"
                   />
-                  <span className="text-sm text-[var(--ink-soft)]">Mostrar solo pendientes de pago</span>
+                  <span className="text-sm text-gray-700">Mostrar solo pendientes de pago</span>
                 </label>
               </div>
             )}
@@ -273,7 +244,7 @@ export default function RecibosPage() {
                 }}
                 className="w-5 h-5"
               />
-              <span className="text-sm text-[var(--ink-soft)]">Mostrar solo pendientes de pago</span>
+              <span className="text-sm text-gray-700">Mostrar solo pendientes de pago</span>
             </label>
           </div>
         )}
@@ -281,32 +252,32 @@ export default function RecibosPage() {
 
       {/* Resumen del maestro */}
       {teacherSummary && (
-        <div className="bg-[linear-gradient(135deg,#f8eddd_0%,#f4dcc0_100%)] rounded-2xl shadow-md p-6 mb-6 border-2 border-[var(--sand-strong)]/60">
-          <h2 className="text-2xl font-bold mb-4 text-[var(--ink)]">{teacherSummary.teacher_name}</h2>
-          <p className="text-[var(--ink-soft)] mb-4">{teacherSummary.grupo}</p>
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-md p-6 mb-6 border-2 border-blue-200">
+          <h2 className="text-2xl font-bold mb-4">{teacherSummary.teacher_name}</h2>
+          <p className="text-gray-700 mb-4">{teacherSummary.grupo}</p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-[var(--cream)] rounded-xl p-4 border border-[var(--sand-strong)]/40">
-              <p className="text-sm text-[var(--ink-soft)]">Total Transacciones</p>
-              <p className="text-2xl font-bold text-[var(--cafe-dark)]">{teacherSummary.total_transactions}</p>
+            <div className="bg-white rounded-lg p-4">
+              <p className="text-sm text-gray-600">Total Transacciones</p>
+              <p className="text-2xl font-bold text-blue-600">{teacherSummary.total_transactions}</p>
             </div>
-            <div className="bg-[var(--cream)] rounded-xl p-4 border border-[var(--sand-strong)]/40">
-              <p className="text-sm text-[var(--ink-soft)]">Monto Total</p>
-              <p className="text-2xl font-bold text-[var(--cafe-dark)]">{formatCurrency(teacherSummary.total_amount)}</p>
+            <div className="bg-white rounded-lg p-4">
+              <p className="text-sm text-gray-600">Monto Total</p>
+              <p className="text-2xl font-bold text-blue-600">{formatCurrency(teacherSummary.total_amount)}</p>
             </div>
-            <div className="bg-[var(--cream)] rounded-xl p-4 border border-[var(--sand-strong)]/40">
-              <p className="text-sm text-[var(--ink-soft)]">Total Pagado</p>
-              <p className="text-2xl font-bold text-[var(--accent-leaf)]">{formatCurrency(teacherSummary.total_paid)}</p>
+            <div className="bg-white rounded-lg p-4">
+              <p className="text-sm text-gray-600">Total Pagado</p>
+              <p className="text-2xl font-bold text-green-600">{formatCurrency(teacherSummary.total_paid)}</p>
             </div>
-            <div className="bg-[var(--cream)] rounded-xl p-4 border border-[var(--sand-strong)]/40">
-              <p className="text-sm text-[var(--ink-soft)]">Total Pendiente</p>
-              <p className="text-2xl font-bold text-[var(--accent-coral)]">{formatCurrency(teacherSummary.total_pending)}</p>
+            <div className="bg-white rounded-lg p-4">
+              <p className="text-sm text-gray-600">Total Pendiente</p>
+              <p className="text-2xl font-bold text-red-600">{formatCurrency(teacherSummary.total_pending)}</p>
             </div>
           </div>
 
           {transactions.length > 0 && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between bg-[var(--cream)]/70 rounded-lg p-3 border border-[var(--sand-strong)]/30">
+              <div className="flex items-center justify-between bg-white/50 rounded-lg p-3">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -314,7 +285,7 @@ export default function RecibosPage() {
                     onChange={toggleSelectAll}
                     className="w-5 h-5 rounded"
                   />
-                  <span className="font-semibold text-[var(--ink)]">
+                  <span className="font-semibold text-gray-700">
                     Seleccionar todos ({selectedTransactions.size} de {transactions.length} tickets seleccionados)
                   </span>
                 </label>
@@ -322,11 +293,18 @@ export default function RecibosPage() {
               
               <div className="flex gap-3">
                 <button
-                  onClick={() => handleGenerateConsolidatedReceipt()}
+                  onClick={() => handleGenerateConsolidatedReceipt(false)}
                   disabled={selectedTransactions.size === 0}
-                  className="flex-1 bg-[linear-gradient(120deg,var(--cafe-dark)_0%,var(--cafe-mid)_100%)] hover:brightness-110 text-[var(--cream)] px-6 py-3 rounded-lg font-bold disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   📥 Descargar Recibo Consolidado ({selectedTransactions.size} tickets)
+                </button>
+                <button
+                  onClick={() => handleGenerateConsolidatedReceipt(true)}
+                  disabled={selectedTransactions.size === 0}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  🖨️ Imprimir Recibo Consolidado ({selectedTransactions.size} tickets)
                 </button>
               </div>
             </div>
@@ -336,9 +314,9 @@ export default function RecibosPage() {
 
       {/* Lista de transacciones */}
       {transactions.length > 0 && (
-        <div className="bg-[var(--cream)] rounded-2xl shadow-md p-6 border border-[var(--sand-strong)]/40">
-          <h2 className="text-xl font-bold mb-4 text-[var(--ink)]">Transacciones Individuales</h2>
-          <p className="text-sm text-[var(--ink-soft)] mb-4">
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-xl font-bold mb-4">Transacciones Individuales</h2>
+          <p className="text-sm text-gray-600 mb-4">
             💡 <strong>Tip:</strong> Selecciona los tickets que deseas incluir en el recibo consolidado
           </p>
           <div className="space-y-4">
@@ -347,8 +325,8 @@ export default function RecibosPage() {
                 key={transaction.id}
                 className={`border-2 rounded-lg p-4 transition-all ${
                   selectedTransactions.has(transaction.id)
-                    ? 'border-[var(--cafe-dark)] bg-[var(--beige)]/60'
-                    : 'border-[var(--sand-strong)]/40 hover:border-[var(--cafe-mid)]'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -362,20 +340,20 @@ export default function RecibosPage() {
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <p className="font-bold text-lg text-[var(--ink)]">Ticket #{transaction.id}</p>
-                        <p className="text-sm text-[var(--ink-soft)]">
+                        <p className="font-bold text-lg">Ticket #{transaction.id}</p>
+                        <p className="text-sm text-gray-600">
                           {new Date(transaction.fecha).toLocaleString('es-MX')}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-[var(--cafe-dark)]">
+                        <p className="text-2xl font-bold text-blue-600">
                           {formatCurrency(transaction.total)}
                         </p>
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${
                             transaction.pagado === 'SI'
-                              ? 'bg-[rgba(63,143,98,0.16)] text-[var(--accent-leaf)]'
-                              : 'bg-[rgba(232,111,74,0.15)] text-[var(--cafe-dark)]'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
                           }`}
                         >
                           {transaction.pagado === 'SI' ? '✓ Pagado' : '✗ Pendiente'}
@@ -384,8 +362,8 @@ export default function RecibosPage() {
                     </div>
 
                     <div className="mb-3">
-                      <p className="text-sm font-semibold text-[var(--ink-soft)] mb-1">Productos:</p>
-                      <ul className="text-sm text-[var(--ink-soft)] ml-4">
+                      <p className="text-sm font-semibold text-gray-700 mb-1">Productos:</p>
+                      <ul className="text-sm text-gray-600 ml-4">
                         {transaction.productos.map((producto: any, idx: number) => (
                           <li key={idx}>
                             {producto.cantidad}x {producto.nombre} - {formatCurrency(producto.subtotal)}
@@ -396,10 +374,16 @@ export default function RecibosPage() {
 
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleGenerateIndividualReceipt(transaction)}
-                        className="flex-1 bg-[linear-gradient(120deg,var(--cafe-dark)_0%,var(--cafe-mid)_100%)] hover:brightness-110 text-[var(--cream)] px-4 py-2 rounded-lg text-sm font-bold"
+                        onClick={() => handleGenerateIndividualReceipt(transaction, false)}
+                        className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-bold"
                       >
-                        📥 Descargar Ticket
+                        📥 Descargar
+                      </button>
+                      <button
+                        onClick={() => handleGenerateIndividualReceipt(transaction, true)}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold"
+                      >
+                        🖨️ Imprimir
                       </button>
                     </div>
                   </div>
@@ -411,9 +395,9 @@ export default function RecibosPage() {
       )}
 
       {selectedTeacher && !loading && transactions.length === 0 && teacherSummary && (
-        <div className="bg-[var(--beige)] rounded-xl p-12 text-center border border-[var(--sand-strong)]/40">
+        <div className="bg-gray-50 rounded-xl p-12 text-center">
           <div className="text-6xl mb-4">📄</div>
-          <p className="text-xl text-[var(--ink-soft)]">No hay transacciones para este maestro</p>
+          <p className="text-xl text-gray-600">No hay transacciones para este maestro</p>
         </div>
       )}
     </div>

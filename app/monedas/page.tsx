@@ -150,10 +150,10 @@ function MonedasContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_10%_18%,rgba(242,182,70,0.18)_0,transparent_26%),radial-gradient(circle_at_86%_12%,rgba(232,111,74,0.18)_0,transparent_22%),linear-gradient(140deg,#f9efe3_0%,#f5debf_100%)] p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="bg-[var(--cream)] rounded-3xl shadow-2xl p-6 mb-6 border border-[var(--sand-strong)]/40">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => router.back()}
@@ -161,12 +161,12 @@ function MonedasContent() {
             >
               ⬅️
             </button>
-            <h1 className="text-4xl font-black text-[var(--ink)]">
+            <h1 className="text-4xl font-bold text-gray-800">
               {modo === 'pago' ? '💰 ¿Con cuánto pagas?' : '💵 Tu cambio'}
             </h1>
             <button
               onClick={limpiar}
-              className="bg-[linear-gradient(120deg,var(--accent-coral)_0%,#b95032_100%)] hover:brightness-110 text-[var(--cream)] px-6 py-3 rounded-2xl text-xl font-bold"
+              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl text-xl font-bold"
             >
               🗑️ Limpiar
             </button>
@@ -174,13 +174,13 @@ function MonedasContent() {
 
           {/* Display de totales */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="bg-[var(--beige)] rounded-2xl p-6 text-center border border-[var(--sand-strong)]/40">
-              <p className="text-xl font-semibold text-[var(--ink)] mb-2">Total a pagar</p>
-              <p className="text-4xl font-bold text-[var(--cafe-dark)]">{formatCurrency(total)}</p>
+            <div className="bg-blue-100 rounded-2xl p-6 text-center">
+              <p className="text-xl font-semibold text-blue-900 mb-2">Total a pagar</p>
+              <p className="text-4xl font-bold text-blue-600">{formatCurrency(total)}</p>
             </div>
-            <div className="bg-[rgba(63,143,98,0.16)] rounded-2xl p-6 border border-[rgba(63,143,98,0.45)]">
-              <p className="text-xl font-semibold text-[var(--ink)] mb-2 text-center">Pagas con</p>
-              <p className="text-4xl font-bold text-[var(--accent-leaf)] text-center mb-3">{formatCurrency(totalSeleccionado)}</p>
+            <div className="bg-green-100 rounded-2xl p-6">
+              <p className="text-xl font-semibold text-green-900 mb-2 text-center">Pagas con</p>
+              <p className="text-4xl font-bold text-green-600 text-center mb-3">{formatCurrency(totalSeleccionado)}</p>
               {Object.keys(cantidades).some(k => cantidades[parseFloat(k)] > 0) && (
                 <div className="flex flex-wrap gap-2 justify-center mt-3">
                   {Object.entries(cantidades)
@@ -203,19 +203,19 @@ function MonedasContent() {
                 </div>
               )}
             </div>
-            <div className={`rounded-2xl p-6 text-center border ${cambio >= 0 ? 'bg-[rgba(242,182,70,0.2)] border-[var(--accent-honey)]/50' : 'bg-[rgba(232,111,74,0.16)] border-[var(--accent-coral)]/50'}`}>
-              <p className="text-xl font-semibold mb-2 text-[var(--ink)]">Tu cambio</p>
-              <p className={`text-4xl font-bold ${cambio >= 0 ? 'text-[var(--cafe-dark)]' : 'text-[var(--accent-coral)]'}`}>
+            <div className={`rounded-2xl p-6 text-center ${cambio >= 0 ? 'bg-purple-100' : 'bg-red-100'}`}>
+              <p className="text-xl font-semibold mb-2">Tu cambio</p>
+              <p className={`text-4xl font-bold ${cambio >= 0 ? 'text-purple-600' : 'text-red-600'}`}>
                 {formatCurrency(Math.abs(cambio))}
               </p>
-              {cambio < 0 && <p className="text-[var(--accent-coral)] mt-2 text-lg">❌ Falta dinero</p>}
+              {cambio < 0 && <p className="text-red-600 mt-2 text-lg">❌ Falta dinero</p>}
             </div>
           </div>
         </div>
 
         {/* Selector de monedas y billetes */}
-        <div className="bg-[var(--cream)] rounded-3xl shadow-2xl p-6 mb-6 border border-[var(--sand-strong)]/40">
-          <h2 className="text-3xl font-bold text-[var(--ink)] mb-6">
+        <div className="bg-white rounded-3xl shadow-2xl p-6 mb-6">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">
             {modo === 'pago' ? '👇 Selecciona billetes y monedas' : '💡 Opciones para dar cambio'}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -247,7 +247,7 @@ function MonedasContent() {
                     <div className="flex items-center justify-center gap-2 mb-2">
                       <button
                         onClick={() => decrementar(denom.valor)}
-                        className="bg-[var(--accent-coral)] hover:bg-[#b95032] text-[var(--cream)] w-12 h-12 rounded-xl text-3xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-red-500 hover:bg-red-600 text-white w-12 h-12 rounded-xl text-3xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={cantidad === 0}
                       >
                         −
@@ -257,7 +257,7 @@ function MonedasContent() {
                       </div>
                       <button
                         onClick={() => incrementar(denom.valor)}
-                        className="bg-[var(--accent-leaf)] hover:bg-[#2f6f4e] text-[var(--cream)] w-12 h-12 rounded-xl text-3xl font-bold"
+                        className="bg-green-500 hover:bg-green-600 text-white w-12 h-12 rounded-xl text-3xl font-bold"
                       >
                         +
                       </button>
@@ -276,12 +276,12 @@ function MonedasContent() {
 
         {/* Sugerencia de cambio */}
         {modo === 'pago' && cambio > 0 && Object.keys(sugerenciaCambio).length > 0 && (
-          <div className="bg-gradient-to-r from-[var(--beige)] to-[#f4d9b5] rounded-3xl shadow-2xl p-6 border-4 border-[var(--sand-strong)]">
+          <div className="bg-gradient-to-r from-yellow-100 to-yellow-200 rounded-3xl shadow-2xl p-6 border-4 border-yellow-400">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-3xl font-bold text-[var(--ink)] flex items-center gap-3">
+              <h2 className="text-3xl font-bold text-yellow-900 flex items-center gap-3">
                 💡 <span>Sugerencia para dar el cambio</span>
               </h2>
-              <span className="text-2xl font-bold text-[var(--cafe-dark)]">{formatCurrency(cambio)}</span>
+              <span className="text-2xl font-bold text-yellow-900">{formatCurrency(cambio)}</span>
             </div>
             <div className="flex flex-wrap gap-2 items-center justify-center mb-4">
               {Object.entries(sugerenciaCambio).map(([valor, cantidad]) => {
@@ -302,7 +302,7 @@ function MonedasContent() {
             </div>
             <button
               onClick={getNextChangeSuggestion}
-              className="w-full bg-[linear-gradient(120deg,var(--sand-strong)_0%,var(--accent-honey)_100%)] hover:brightness-105 text-[var(--ink)] px-6 py-3 rounded-2xl text-xl font-bold transition"
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-2xl text-xl font-bold transition-colors"
             >
               🔄 Ver otra sugerencia
             </button>
@@ -317,7 +317,7 @@ function MonedasContent() {
               disabled={totalSeleccionado < total}
               className={`w-full text-3xl font-bold py-6 rounded-2xl shadow-lg transition-all ${
                 totalSeleccionado >= total
-                  ? 'bg-[linear-gradient(120deg,var(--accent-leaf)_0%,#2f6f4e_100%)] hover:brightness-110 text-[var(--cream)] hover:scale-105'
+                  ? 'bg-green-500 hover:bg-green-600 text-white hover:scale-105'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >

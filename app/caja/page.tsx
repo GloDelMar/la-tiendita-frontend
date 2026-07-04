@@ -113,34 +113,34 @@ export default function CajaPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--cafe-dark)]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-black text-[var(--ink)] mb-8">Control de Caja</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Control de Caja</h1>
 
       {/* Saldo actual */}
-      <div className="bg-[linear-gradient(120deg,var(--cafe-dark)_0%,var(--cafe-mid)_60%,#a3603b_100%)] rounded-2xl shadow-lg p-8 mb-8 text-[var(--cream)]">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-8 mb-8 text-white">
         <p className="text-lg mb-2 opacity-90">Saldo en Caja</p>
         <p className="text-5xl font-bold">{formatCurrency(balance)}</p>
       </div>
 
       {/* Estadísticas del día */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-[var(--cream)] rounded-2xl shadow-sm p-6 border border-[var(--sand-strong)]/50">
-          <p className="text-sm text-[var(--ink-soft)] mb-2">Saldo Inicial</p>
-          <p className="text-2xl font-bold text-[var(--ink)]">{formatCurrency(stats.saldo_inicial)}</p>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <p className="text-sm text-gray-600 mb-2">Saldo Inicial</p>
+          <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.saldo_inicial)}</p>
         </div>
-        <div className="bg-[var(--cream)] rounded-2xl shadow-sm p-6 border border-[var(--sand-strong)]/50">
-          <p className="text-sm text-[var(--ink-soft)] mb-2">Ingresos del Día</p>
-          <p className="text-2xl font-bold text-[var(--accent-leaf)]">{formatCurrency(stats.ingresos)}</p>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <p className="text-sm text-gray-600 mb-2">Ingresos del Día</p>
+          <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.ingresos)}</p>
         </div>
-        <div className="bg-[var(--cream)] rounded-2xl shadow-sm p-6 border border-[var(--sand-strong)]/50">
-          <p className="text-sm text-[var(--ink-soft)] mb-2">Egresos del Día</p>
-          <p className="text-2xl font-bold text-[var(--accent-coral)]">{formatCurrency(stats.egresos)}</p>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <p className="text-sm text-gray-600 mb-2">Egresos del Día</p>
+          <p className="text-2xl font-bold text-red-600">{formatCurrency(stats.egresos)}</p>
         </div>
       </div>
 
@@ -148,32 +148,32 @@ export default function CajaPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <button
           onClick={() => openModal('INGRESO')}
-          className="bg-[linear-gradient(120deg,var(--accent-leaf)_0%,#2f6f4e_100%)] hover:brightness-110 text-[var(--cream)] p-4 rounded-xl font-semibold transition"
+          className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg font-medium transition-colors"
         >
           + Registrar Ingreso
         </button>
         <button
           onClick={() => openModal('EGRESO')}
-          className="bg-[linear-gradient(120deg,var(--accent-coral)_0%,#b95032_100%)] hover:brightness-110 text-[var(--cream)] p-4 rounded-xl font-semibold transition"
+          className="bg-red-600 hover:bg-red-700 text-white p-4 rounded-lg font-medium transition-colors"
         >
           - Registrar Egreso
         </button>
         <button
           onClick={() => openModal('AJUSTE')}
-          className="bg-[linear-gradient(120deg,var(--sand-strong)_0%,var(--accent-honey)_100%)] hover:brightness-105 text-[var(--ink)] p-4 rounded-xl font-semibold transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg font-medium transition-colors"
         >
           ⚙️ Ajustar Saldo
         </button>
       </div>
 
       {/* Historial */}
-      <div className="bg-[var(--cream)] rounded-2xl shadow-sm overflow-hidden border border-[var(--sand-strong)]/40">
-        <div className="px-6 py-4 border-b border-[var(--sand-strong)]/40 bg-[var(--beige)]">
-          <h2 className="text-xl font-semibold text-[var(--ink)]">Historial de Movimientos</h2>
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b">
+          <h2 className="text-xl font-semibold">Historial de Movimientos</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-[var(--beige)]/60">
+            <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Fecha
@@ -192,9 +192,9 @@ export default function CajaPage() {
                 </th>
               </tr>
             </thead>
-              <tbody className="divide-y divide-[var(--sand-strong)]/30">
+            <tbody className="divide-y divide-gray-200">
               {operations.map((op) => (
-                <tr key={op.id} className="hover:bg-[var(--beige)]/45">
+                <tr key={op.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDateTime(op.fecha)}
                   </td>
@@ -226,8 +226,8 @@ export default function CajaPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[var(--cream)] rounded-2xl max-w-md w-full p-6 border border-[var(--sand-strong)]">
-            <h2 className="text-2xl font-bold mb-4 text-[var(--ink)]">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold mb-4">
               {operationType === 'INGRESO' ? 'Registrar Ingreso' : 
                operationType === 'EGRESO' ? 'Registrar Egreso' : 'Ajustar Saldo'}
             </h2>
@@ -241,7 +241,7 @@ export default function CajaPage() {
                   step="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full px-4 py-2 border border-[var(--sand-strong)] rounded-lg focus:ring-2 focus:ring-[var(--cafe-dark)] focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="0.00"
                   required
                 />
@@ -253,7 +253,7 @@ export default function CajaPage() {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2 border border-[var(--sand-strong)] rounded-lg focus:ring-2 focus:ring-[var(--cafe-dark)] focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Describe el motivo..."
                   rows={3}
                   required
@@ -267,16 +267,16 @@ export default function CajaPage() {
                     setAmount('');
                     setDescription('');
                   }}
-                  className="flex-1 px-4 py-2 border border-[var(--sand-strong)] rounded-lg hover:bg-[var(--beige)]"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   className={`flex-1 text-white px-4 py-2 rounded-lg ${
-                    operationType === 'INGRESO' ? 'bg-[linear-gradient(120deg,var(--accent-leaf)_0%,#2f6f4e_100%)] hover:brightness-110' :
-                    operationType === 'EGRESO' ? 'bg-[linear-gradient(120deg,var(--accent-coral)_0%,#b95032_100%)] hover:brightness-110' :
-                    'bg-[linear-gradient(120deg,var(--cafe-dark)_0%,var(--cafe-mid)_100%)] hover:brightness-110'
+                    operationType === 'INGRESO' ? 'bg-green-600 hover:bg-green-700' :
+                    operationType === 'EGRESO' ? 'bg-red-600 hover:bg-red-700' :
+                    'bg-blue-600 hover:bg-blue-700'
                   }`}
                 >
                   Registrar

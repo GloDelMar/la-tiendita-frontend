@@ -1,20 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9f0e5;
-  --foreground: #231711;
-  --beige: #f6e4cf;
-  --sand: #ebcfa6;
-  --sand-strong: #d3a977;
-  --cafe-mid: #744528;
-  --cafe-dark: #4a2b1b;
-  --ink: #231711;
-  --ink-soft: #6f4b37;
-  --cream: #fff9f1;
-  --accent-honey: #f2b646;
-  --accent-coral: #e86f4a;
-  --accent-leaf: #3f8f62;
-  --accent-sky: #4a9bcf;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @theme inline {
@@ -26,44 +14,13 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #f7efe5;
-    --foreground: #1f1612;
+    --background: #0a0a0a;
+    --foreground: #ededed;
   }
 }
 
 body {
-  background:
-    radial-gradient(circle at 12% 18%, rgba(255, 248, 238, 0.72) 0, transparent 26%),
-    radial-gradient(circle at 84% 8%, rgba(238, 197, 139, 0.32) 0, transparent 23%),
-    radial-gradient(circle at 78% 82%, rgba(232, 111, 74, 0.12) 0, transparent 20%),
-    linear-gradient(180deg, #f9f0e5 0%, #f4e3cf 100%);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), Arial, Helvetica, sans-serif;
-}
-
-.app-shell {
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 6% 20%, rgba(242, 182, 70, 0.12) 0, transparent 22%),
-    radial-gradient(circle at 92% 12%, rgba(74, 155, 207, 0.12) 0, transparent 20%),
-    radial-gradient(circle at 90% 88%, rgba(63, 143, 98, 0.11) 0, transparent 22%);
-}
-
-.app-main {
-  position: relative;
-}
-
-.app-main::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 1.25rem;
-  border: 1px solid rgba(146, 103, 73, 0.2);
-  background: rgba(255, 249, 241, 0.58);
-  backdrop-filter: blur(2px);
-  pointer-events: none;
-}
-
-.app-main > * {
-  position: relative;
 }

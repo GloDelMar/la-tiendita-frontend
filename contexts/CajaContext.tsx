@@ -1,8 +1,13 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { cajasApi } from '@/lib/api';
-import { Caja, FALLBACK_SINGLE_CAJA } from '@/lib/caja';
+
+interface Caja {
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  activa: boolean;
+}
 
 interface CajaContextType {
   selectedCaja: Caja | null;
@@ -13,29 +18,30 @@ interface CajaContextType {
 const CajaContext = createContext<CajaContextType | undefined>(undefined);
 
 export function CajaProvider({ children }: { children: ReactNode }) {
-  const [selectedCaja, setSelectedCajaState] = useState<Caja | null>(FALLBACK_SINGLE_CAJA);
+  const [selectedCaja, setSelectedCajaState] = useState<Caja | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Siempre usar la caja unica configurada en backend.
+  // Cargar caja seleccionada desde localStorage al iniciar
   useEffect(() => {
-    const bootstrapCaja = async () => {
+    const savedCaja = localStorage.getItem('selected_caja');
+    if (savedCaja) {
       try {
-        const currentCaja = await cajasApi.getCurrent();
-        setSelectedCajaState(currentCaja);
+        setSelectedCajaState(JSON.parse(savedCaja));
       } catch (e) {
-        console.error('Error loading current caja:', e);
-        setSelectedCajaState(FALLBACK_SINGLE_CAJA);
-      } finally {
-        setIsLoading(false);
+        console.error('Error loading selected caja:', e);
       }
-    };
-
-    bootstrapCaja();
+    }
+    setIsLoading(false);
   }, []);
 
+  // Guardar en localStorage cuando cambia la caja
   const setSelectedCaja = (caja: Caja | null) => {
-    // Evita dejar el sistema sin caja seleccionada.
-    setSelectedCajaState(caja ?? FALLBACK_SINGLE_CAJA);
+    setSelectedCajaState(caja);
+    if (caja) {
+      localStorage.setItem('selected_caja', JSON.stringify(caja));
+    } else {
+      localStorage.removeItem('selected_caja');
+    }
   };
 
   return (
