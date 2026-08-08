@@ -1,192 +1,209 @@
-# 🛍️ La Tiendita - Frontend
+# 🛒 La Tiendita POS — Frontend
 
-Una plataforma de e-commerce moderna y responsive construida con las tecnologías más actuales. Un proyecto full-stack que demuestra habilidades en desarrollo frontend, integración de APIs y mejores prácticas de código.
+> Frontend application for a full-stack point-of-sale system focused on sales, cash operations, product management, debtors, and reporting workflows.
 
-**[🌐 Ver Demo en Vivo](https://la-tiendita-frontend.vercel.app)**
-
----
-
-## 📋 Tabla de Contenidos
-
-- [Características Principales](#características-principales)
-- [Tech Stack](#tech-stack)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Instalación y Setup](#instalación-y-setup)
-- [Scripts Disponibles](#scripts-disponibles)
-- [Características Técnicas](#características-técnicas)
-- [Cómo Contribuir](#cómo-contribuir)
+🌐 Live deployment: [https://la-tiendita-frontend.vercel.app/](https://la-tiendita-frontend.vercel.app/)
 
 ---
 
-## ✨ Características Principales
+## 🎯 About the project
 
-- **🎨 Interfaz Moderna y Responsiva** - Diseño adaptable a todos los dispositivos
-- **⚡ Rendimiento Optimizado** - Cargas rápidas y experiencia fluida
-- **🔍 SEO Optimizado** - Metaetiquetas dinámicas y estructura semántica
-- **🛒 Sistema de Carrito Completo** - Gestión de productos y órdenes
-- **👤 Autenticación de Usuarios** - Login seguro y gestión de sesiones
-- **💳 Integración de Pagos** - Procesamiento seguro de transacciones
-- **📱 Mobile-First Design** - Experiencia perfecta en dispositivos móviles
-- **🎯 TypeScript** - Tipado fuerte para mayor seguridad y mantenibilidad
+La Tiendita POS is a business-oriented application that started as a desktop Kivy solution and evolved into a modern web architecture.
+
+This repository contains the **frontend layer**, built to deliver a responsive user experience and integrate with backend services that handle business logic and persistence.
+
+- Modern and responsive interface
+- API-driven architecture
+- Operational workflows for day-to-day store management
+- Deployment-ready structure
 
 ---
 
-## 🛠️ Tech Stack
+## 💼 Value for recruiters
+
+This project demonstrates practical skills for real software teams:
+
+- Frontend architecture with **Next.js + TypeScript**
+- Integration with REST APIs
+- UI development focused on operational workflows
+- Feature design based on real business needs
+- Migration mindset from legacy desktop systems to web platforms
+- Production deployment and environment configuration
+
+---
+
+## ✨ Core features (frontend scope)
+
+### Point of sale flow
+- Product browsing and selection
+- Cart interaction
+- Checkout UI flow
+- Sales visualization and history screens
+
+### Product management
+- Product listing and detail views
+- Product creation/edit forms
+- Image upload integration (via backend services)
+
+### Cash and debtor operations
+- Interfaces for cash movement workflows
+- Debtor and payment tracking screens
+- Operational history views
+
+### Reporting
+- Report and receipt-related frontend flows
+- Data visualization screens for operations
+
+---
+
+## 🏗️ Architecture overview
+
+```text
+Frontend (Next.js + TypeScript + Tailwind)
+        │
+        ▼
+Backend API (FastAPI + Python)  → separate repository
+        │
+        ▼
+Data layer and business services
+```
+
+---
+
+## 🔗 Related repositories
+
+- **Frontend (this repo):** `GloDelMar/la-tiendita-frontend`
+- **Backend:** `GloDelMar/la-tiendita-POS`
+
+> Note: The backend implementation is maintained in a separate repository and powers authentication, business logic, storage, and transactional operations.
+
+---
+
+## 🧰 Tech stack
 
 ### Frontend
-- **[Next.js 14+](https://nextjs.org)** - React framework con SSR y SSG
-- **[TypeScript](https://www.typescriptlang.org)** - Tipado estático
-- **[Tailwind CSS](https://tailwindcss.com)** - Utilidades CSS modernas
-- **[React Query](https://tanstack.com/query)** - Gestión de estado y caché
-- **[Zustand](https://github.com/pmndrs/zustand)** - State management ligero
-- **[Axios](https://axios-http.com)** - Cliente HTTP
+- Next.js 14+
+- TypeScript
+- Tailwind CSS
+- React Query
+- Zustand
+- Axios
 
 ### Deployment
-- **[Vercel](https://vercel.com)** - Hosting y CI/CD
-- **[GitHub](https://github.com)** - Control de versiones
+- Vercel (frontend hosting)
+- GitHub (version control)
 
 ---
 
-## 📁 Estructura del Proyecto
+## 📂 Project structure
 
-```
+```text
 la-tiendita-frontend/
 ├── app/                      # Next.js App Router
-│   ├── page.tsx             # Página principal
-│   ├── products/            # Catálogo de productos
-│   ├── cart/                # Carrito de compras
-│   └── checkout/            # Proceso de compra
-├── components/              # Componentes reutilizables
-│   ├── Header.tsx
-│   ├── ProductCard.tsx
-│   └── Navigation.tsx
-├── hooks/                   # Custom React hooks
-├── lib/                     # Utilidades y helpers
-├── public/                  # Archivos estáticos
-├── styles/                  # Estilos globales
-├── types/                   # Definiciones TypeScript
-└── utils/                   # Funciones auxiliares
+│   ├── page.tsx              # Main page
+│   ├── products/             # Product catalog views
+│   ├── cart/                 # Cart flow
+│   └── checkout/             # Checkout process
+├── components/               # Reusable UI components
+├── hooks/                    # Custom React hooks
+├── lib/                      # Utilities and helpers
+├── public/                   # Static assets
+├── styles/                   # Global styles
+├── types/                    # TypeScript definitions
+└── utils/                    # Helper functions
 ```
 
 ---
 
-## 🚀 Instalación y Setup
+## 🚀 Quick start
 
-### Requisitos Previos
-- Node.js 18+ 
-- npm, yarn, pnpm o bun
+### Requirements
+- Node.js 18+ (recommended: Node.js 20+)
+- npm / yarn / pnpm / bun
 
-### Pasos de Instalación
+### Installation
 
-1. **Clonar el repositorio**
 ```bash
 git clone https://github.com/GloDelMar/la-tiendita-frontend.git
 cd la-tiendita-frontend
-```
-
-2. **Instalar dependencias**
-```bash
 npm install
-# o
-yarn install
-# o
-pnpm install
-# o
-bun install
 ```
 
-3. **Configurar variables de entorno**
+### Environment variables
+
 ```bash
 cp .env.example .env.local
-# Edita .env.local con tus valores
 ```
 
-4. **Iniciar el servidor de desarrollo**
+Then update `.env.local` with your API endpoints and required keys.
+
+### Run in development
+
 ```bash
 npm run dev
-# o
-yarn dev
-# o
-pnpm dev
-# o
-bun dev
 ```
 
-5. **Abrir en el navegador**
-```
-http://localhost:3000
-```
+Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 📦 Scripts Disponibles
+## 📦 Available scripts
 
-| Script | Descripción |
+| Script | Description |
 |--------|-------------|
-| `npm run dev` | Inicia el servidor de desarrollo |
-| `npm run build` | Compila la aplicación para producción |
-| `npm run start` | Inicia el servidor de producción |
-| `npm run lint` | Ejecuta ESLint |
-| `npm run format` | Formatea el código con Prettier |
-| `npm run test` | Ejecuta las pruebas unitarias |
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format code with Prettier |
+| `npm run test` | Run unit tests |
 
 ---
 
-## ⚙️ Características Técnicas
+## 🛠️ Skills demonstrated
 
-### Optimizaciones de Rendimiento
-- ✅ Image Optimization con Next.js Image
-- ✅ Code Splitting automático
-- ✅ Lazy Loading de componentes
-- ✅ Caching estratégico de datos
-
-### Mejores Prácticas
-- ✅ Componentes funcionales con Hooks
-- ✅ Separación de responsabilidades
-- ✅ DRY (Don't Repeat Yourself)
-- ✅ Código limpio y documentado
-- ✅ Git workflow profesional
-
-### Seguridad
-- ✅ Validación de entrada
-- ✅ Protección contra XSS
-- ✅ HTTPS en producción
-- ✅ Variables de entorno seguras
+- Building responsive and reusable frontend components
+- Structuring scalable Next.js applications
+- Consuming and managing API data flows
+- Implementing business-oriented interfaces
+- Working with typed codebases using TypeScript
+- Preparing production-ready deployments
 
 ---
 
-## 🤝 Cómo Contribuir
+## 🔍 What this project helped me develop
 
-Las contribuciones son bienvenidas. Para cambios importantes:
-
-1. Fork el repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+- Migrating real workflows from legacy desktop to web
+- Translating business operations into usable product features
+- Coordinating frontend behavior with backend capabilities
+- Building software with practical, user-centered impact
 
 ---
 
-## 📄 Licencia
+## 👩‍💻 About me
 
-Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
+I’m a developer focused on building functional, useful web products with strong full-stack foundations.
 
----
+I enjoy projects that combine:
 
-## 👨‍💻 Autor
-
-**Gloria del Mar** - [@GloDelMar](https://github.com/GloDelMar)
-
----
-
-## 📞 Contacto y Redes
-
-- **GitHub**: [@GloDelMar](https://github.com/GloDelMar)
-- **Portfolio**: [Tu portfolio aquí]
-- **LinkedIn**: [Tu LinkedIn aquí]
+- modern technologies
+- solid engineering practices
+- real value for users and businesses
 
 ---
 
-## ⭐ Si te gustó el proyecto, considera darle una estrella!
+## 🤝 Contributing
 
-**[⬆ Volver al inicio](#-la-tiendita---frontend)**
+Contributions, suggestions, and feedback are welcome.
+
+1. Fork the repository
+2. Create your branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m "Add amazing feature"`)
+4. Push to your branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
