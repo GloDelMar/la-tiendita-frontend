@@ -1,125 +1,249 @@
 # 🛒 La Tiendita POS — Frontend
 
-> Frontend application for a full-stack point-of-sale system focused on sales, cash operations, product management, debtors, and reporting workflows.
+> Modern web frontend for a real-world point-of-sale system, evolved from a desktop Kivy application into a full-stack web platform.
 
-🌐 Live deployment: [https://la-tiendita-frontend.vercel.app/](https://la-tiendita-frontend.vercel.app/)
-
----
-
-## 🎯 About the project
-
-La Tiendita POS is a business-oriented application that started as a desktop Kivy solution and evolved into a modern web architecture.
-
-This repository contains the **frontend layer**, built to deliver a responsive user experience and integrate with backend services that handle business logic and persistence.
-
-- Modern and responsive interface
-- API-driven architecture
-- Operational workflows for day-to-day store management
-- Deployment-ready structure
+🌐 **Live Demo:** [https://la-tiendita-frontend.vercel.app/](https://la-tiendita-frontend.vercel.app/)
 
 ---
 
-## 💼 Value for recruiters
+## 🎯 Project Overview
 
-This project demonstrates practical skills for real software teams:
+**La Tiendita POS** is a point-of-sale frontend focused on real operational workflows for a school-based store environment.
 
-- Frontend architecture with **Next.js + TypeScript**
-- Integration with REST APIs
-- UI development focused on operational workflows
-- Feature design based on real business needs
-- Migration mindset from legacy desktop systems to web platforms
-- Production deployment and environment configuration
+The project started as a **desktop Kivy application** and later evolved into a web architecture with Next.js.
 
----
+This repository contains the **frontend application** and integrates with a separate REST backend.
 
-## ✨ Core features (frontend scope)
+The backend repository also preserves the original desktop Kivy implementation as legacy functional reference.
 
-### Point of sale flow
-- Product browsing and selection
-- Cart interaction
-- Checkout UI flow
-- Sales visualization and history screens
+Practical development path:
 
-### Product management
-- Product listing and detail views
-- Product creation/edit forms
-- Image upload integration (via backend services)
-
-### Cash and debtor operations
-- Interfaces for cash movement workflows
-- Debtor and payment tracking screens
-- Operational history views
-
-### Reporting
-- Report and receipt-related frontend flows
-- Data visualization screens for operations
+**real requirements -> UI architecture -> migration to web -> API integration -> deployment**
 
 ---
 
-## 🏗️ Architecture overview
+## 🚀 Why This Project Matters
+
+This is not a tutorial app. It was built around day-to-day operational workflows.
+
+What this demonstrates to recruiters:
+
+- Translating business operations into product workflows
+- Migration mindset from legacy desktop software to web
+- Clear frontend/backend separation
+- API-driven architecture with reusable modules
+- Operational UX focused on speed and clarity
+
+### 💡 Evolution of the project
 
 ```text
-Frontend (Next.js + TypeScript + Tailwind)
-        │
-        ▼
-Backend API (FastAPI + Python)  → separate repository
-        │
-        ▼
-Data layer and business services
+Kivy Desktop Application
+          |
+          v
+   Web Application
+          |
+          +---------------+
+          v               v
+       Next.js      FastAPI Backend
+      Frontend
 ```
 
 ---
 
-## 🔗 Related repositories
+## ✨ Implemented Features (Repository Scope)
 
-- **Frontend (this repo):** `GloDelMar/la-tiendita-frontend`
-- **Backend:** `GloDelMar/la-tiendita-POS`
+### 🔐 Access & Session
 
-> Note: The backend implementation is maintained in a separate repository and powers authentication, business logic, storage, and transactional operations.
+- Password-based access screen
+- Client-side auth guard for protected routes
+- Session persistence with localStorage
+
+### 🏪 Multi-Cashbox Workflow
+
+- Dashboard to select active cash boxes
+- Shared selected-cashbox state across modules
+- Quick cashbox switching from navigation
+
+### 🛍️ Sales Module
+
+- Product search and quantity selection
+- Cart management with local persistence
+- Cash and credit sales
+- Transaction creation through API
+- Automatic PDF ticket generation (download/print)
+- Change helper with denomination suggestions
+- Dedicated denomination selector screen
+
+### 📦 Product Management
+
+- Product list by selected cashbox
+- Create, edit, and delete products
+- Product image upload and rendering with fallback URL handling
+
+### 💼 Cashbox Management
+
+- Create and edit cash boxes
+- Toggle active/inactive status
+- View balance and product count per cashbox
+
+### 💰 Cash Operations
+
+- Register incomes, expenses, and adjustments
+- View daily stats and operation history
+
+### 👥 Debtors
+
+- Debtors list with search
+- Debt summary metrics
+- Partial or full payment registration
+- Debtor removal (debt forgiveness flow)
+
+### 📄 Receipts & Collections
+
+- Individual receipt download/print per transaction
+- Transactions query by teacher or all transactions
+- Unpaid-only filtering
+- Multi-ticket selection and consolidated receipt PDF generation
 
 ---
 
-## 🧰 Tech stack
+## 🧩 Frontend Architecture
+
+The frontend is structured with separation between routes, shared state, API services, and utility modules.
+
+```text
+Next.js Application
+|
++-- App Router pages
++-- Reusable components
++-- Context state
++-- API service layer
++-- Utilities (formatting, PDF generation)
+```
+
+### Frontend responsibilities in this repo
+
+- Route-based POS interfaces
+- Access control UX and navigation gating
+- Client-side workflow state (cashbox, cart, forms)
+- REST API consumption through centralized services
+- PDF ticket generation and print flows
+
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- Next.js 14+
-- TypeScript
-- Tailwind CSS
-- React Query
-- Zustand
-- Axios
 
-### Deployment
-- Vercel (frontend hosting)
-- GitHub (version control)
+- **Next.js 16**
+- **React 19**
+- **TypeScript**
+- **Tailwind CSS 4**
+- **jsPDF + jsPDF-AutoTable**
+
+### Backend integration
+
+- REST API integration via fetch-based service modules
+- Configurable API base URL through environment variables
+- Backend maintained in a separate repository
+- Legacy Kivy desktop app preserved there for functional reference
+
+➡️ Backend repository: [https://github.com/GloDelMar/la-tiendita-POS](https://github.com/GloDelMar/la-tiendita-POS)
+
+Notes aligned with backend scope:
+
+- Active backend stack: FastAPI
+- Legacy desktop stack (reference only): Kivy
+- Supabase is not part of the active backend flow
 
 ---
 
-## 📂 Project structure
+## 📈 Engineering Value
+
+This repository highlights:
+
+- Product thinking over isolated UI demos
+- End-to-end operational flow design
+- State handling across multiple modules
+- Modernization and migration capability
+- Integration work between frontend and external APIs
+
+---
+
+## 📂 Project Structure
 
 ```text
 la-tiendita-frontend/
-├── app/                      # Next.js App Router
-│   ├── page.tsx              # Main page
-│   ├── products/             # Product catalog views
-│   ├── cart/                 # Cart flow
-│   └── checkout/             # Checkout process
-├── components/               # Reusable UI components
-├── hooks/                    # Custom React hooks
-├── lib/                      # Utilities and helpers
-├── public/                   # Static assets
-├── styles/                   # Global styles
-├── types/                    # TypeScript definitions
-└── utils/                    # Helper functions
+├── app/                    # Route-based views (App Router)
+│   ├── page.tsx            # Dashboard and cashbox selection
+│   ├── login/              # Access screen
+│   ├── ventas/             # Sales and checkout workflow
+│   ├── monedas/            # Denomination selector
+│   ├── productos/          # Product management
+│   ├── cajas/              # Cashbox administration
+│   ├── caja/               # Cash operations
+│   ├── deudores/           # Debtors and payments
+│   └── recibos/            # Receipts and consolidated receipts
+├── components/             # Navigation, auth guard, selectors
+├── contexts/               # Shared state providers
+├── lib/                    # API, auth, PDF, utility modules
+├── public/                 # Static assets
+└── next.config.ts          # Next.js configuration
 ```
 
 ---
 
-## 🚀 Quick start
+## 🌐 Deployment
+
+Deployed on **Vercel** and connected to backend REST endpoints.
+
+- Live app: [https://la-tiendita-frontend.vercel.app/](https://la-tiendita-frontend.vercel.app/)
+- Frontend repository: [https://github.com/GloDelMar/la-tiendita-frontend](https://github.com/GloDelMar/la-tiendita-frontend)
+- Backend repository: [https://github.com/GloDelMar/la-tiendita-POS](https://github.com/GloDelMar/la-tiendita-POS)
+
+---
+
+## 👩‍💻 About the Developer
+
+I am a **Full Stack Developer with a background in Special Education**.
+
+That perspective shapes how I build software: practical workflows, understandable interfaces, and user-centered operational experiences.
+
+---
+
+## 🔎 Skills Demonstrated
+
+### Frontend
+
+- React and Next.js application development
+- TypeScript in operational workflows
+- Responsive UI with Tailwind CSS
+- API-driven screen and component design
+- Browser-side PDF generation flows
+
+### Full Stack Integration
+
+- Frontend/backend separation
+- REST API consumption patterns
+- Transactional UI integration
+- Access/auth workflow implementation
+
+### Engineering
+
+- Legacy-to-web migration mindset
+- Component-based architecture
+- Refactoring and modernization
+- Real-world requirements analysis
+- User-centered product development
+
+---
+
+## 🚀 Running Locally
 
 ### Requirements
-- Node.js 18+ (recommended: Node.js 20+)
-- npm / yarn / pnpm / bun
+
+- Node.js 18+ (recommended 20+)
+- npm
 
 ### Installation
 
@@ -129,78 +253,40 @@ cd la-tiendita-frontend
 npm install
 ```
 
-### Environment variables
+### Environment Variables
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Then update `.env.local` with your API endpoints and required keys.
+Required variables:
 
-### Run in development
+- `NEXT_PUBLIC_API_URL` (example: `http://localhost:8000`)
+- `NEXT_PUBLIC_AUTH_PASSWORD` (frontend access password)
+
+### Development
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 📦 Available scripts
+## 📦 Available Scripts
 
-| Script | Description |
+| Command | Description |
 |--------|-------------|
 | `npm run dev` | Start development server |
 | `npm run build` | Build for production |
 | `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
-| `npm run format` | Format code with Prettier |
-| `npm run test` | Run unit tests |
 
 ---
 
-## 🛠️ Skills demonstrated
+## ✅ Scope Note
 
-- Building responsive and reusable frontend components
-- Structuring scalable Next.js applications
-- Consuming and managing API data flows
-- Implementing business-oriented interfaces
-- Working with typed codebases using TypeScript
-- Preparing production-ready deployments
-
----
-
-## 🔍 What this project helped me develop
-
-- Migrating real workflows from legacy desktop to web
-- Translating business operations into usable product features
-- Coordinating frontend behavior with backend capabilities
-- Building software with practical, user-centered impact
-
----
-
-## 👩‍💻 About me
-
-I’m a developer focused on building functional, useful web products with strong full-stack foundations.
-
-I enjoy projects that combine:
-
-- modern technologies
-- solid engineering practices
-- real value for users and businesses
-
----
-
-## 🤝 Contributing
-
-Contributions, suggestions, and feedback are welcome.
-
-1. Fork the repository
-2. Create your branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m "Add amazing feature"`)
-4. Push to your branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+This README describes functionality currently implemented in this frontend repository.
 
 ---
 
